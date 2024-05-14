@@ -4,6 +4,18 @@ const Button = ({text, handleClick}) => (
     <button onClick={handleClick}>{text}</button>
 )
 
+const MostVotes = ({votes, anecdotes}) => {
+    const mostVotes = Math.max(...votes)
+    const index = votes.indexOf(mostVotes)
+
+    return (
+        <div>
+            <h1>Anecdote with most votes</h1>
+            <p>{anecdotes[index]}</p>
+        </div>
+    )
+}
+
 const App = () => {
     const anecdotes = [
         'If it hurts, do it more often.',
@@ -36,6 +48,7 @@ const App = () => {
             <p>has {votes[selected]} votes</p>
             <Button text={"next anecdote"} handleClick={() => setSelected(getRandomInt(anecdotes.length))} />
             <Button text={"vote"} handleClick={handleVote} />
+            <MostVotes votes={votes} anecdotes={anecdotes} />
         </div>
     )
 }
