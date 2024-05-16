@@ -1,5 +1,4 @@
 import { useState } from "react";
-import axios from "axios";
 import personService from "../services/persons";
 
 const InputForm = ({ persons, setPersons }) => {
@@ -11,7 +10,7 @@ const InputForm = ({ persons, setPersons }) => {
         const personObject = {
             name: newName,
             number: newNumber,
-            id: persons.length + 1
+            id: (persons.length + 1).toString()
         }
 
         const duplicateName = persons.find(person => person.name === newName)
