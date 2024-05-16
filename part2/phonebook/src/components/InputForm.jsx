@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import personService from "../services/persons";
 
 const InputForm = ({ persons, setPersons }) => {
     const [newName, setNewName] = useState('')
@@ -17,9 +18,8 @@ const InputForm = ({ persons, setPersons }) => {
         if (duplicateName) {
             alert(`${newName} is already added to phonebook`)
         } else {
-            axios
-                .post('http://localhost:3001/persons', personObject)
-                .then(response => console.log(response))
+            personService
+                .create(personObject)
 
             setPersons(persons.concat(personObject))
             setNewName('')

@@ -1,20 +1,17 @@
 import { useState, useEffect } from 'react'
 
-import Persons from "./components/Persons.jsx";
-import InputForm from "./components/InputForm.jsx";
-import Filter from "./components/Filter.jsx";
-
-import axios from "axios";
+import Persons from "./components/Persons";
+import InputForm from "./components/InputForm";
+import Filter from "./components/Filter";
+import personService from "./services/persons";
 
 const App = () => {
     const [persons, setPersons] = useState([])
 
     const hook = () => {
-        axios
-            .get('http://localhost:3001/persons')
-            .then(response => {
-                setPersons(response.data)
-            })
+        personService
+            .getAll()
+            .then(initialPersons => setPersons(initialPersons))
     }
 
     useEffect(hook, [])
