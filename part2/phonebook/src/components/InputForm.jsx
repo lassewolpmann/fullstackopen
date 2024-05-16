@@ -13,17 +13,26 @@ const InputForm = ({ persons, setPersons }) => {
             id: (persons.length + 1).toString()
         }
 
-        const duplicateName = persons.find(person => person.name === newName)
-        if (duplicateName) {
-            alert(`${newName} is already added to phonebook`)
+        const duplicate = persons.find(person => person.name === newName)
+        if (duplicate) {
+            if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
+                const copy = [...persons]
+                const index = copy.indexOf(duplicate)
+                copy[index].number = personObject.number
+                setPersons(copy)
+
+                personService
+                    .update(duplicate.id, personObject)
+            }
         } else {
             personService
                 .create(personObject)
 
             setPersons(persons.concat(personObject))
-            setNewName('')
-            setNewNumber('')
         }
+
+        setNewName('')
+        setNewNumber('')
     }
 
     const handleNameChange = (event) => {
