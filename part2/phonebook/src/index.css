@@ -1,5 +1,4 @@
 .notification {
-    background: rgba(0, 255, 0, 0.5);
     padding: 10px;
     display: flex;
     align-items: center;
@@ -8,4 +7,12 @@
     font-weight: bold;
     border-radius: 10px;
     box-shadow: #dedede 0 0 10px 1px;
+}
+
+.notification.success {
+    background: rgba(0, 255, 0, 0.5);
+}
+
+.notification.error {
+    background: rgba(255, 0, 0, 0.5);
 }

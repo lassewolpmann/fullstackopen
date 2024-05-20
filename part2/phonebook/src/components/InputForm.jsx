@@ -6,6 +6,7 @@ const InputForm = ({ persons, setPersons }) => {
     const [newName, setNewName] = useState('')
     const [newNumber, setNewNumber] = useState('')
     const [message, setMessage] = useState(null)
+    const [messageStatus, setMessageStatus] = useState('')
 
     const addPerson = (event) => {
         event.preventDefault()
@@ -25,8 +26,13 @@ const InputForm = ({ persons, setPersons }) => {
 
                 personService
                     .update(duplicate.id, personObject)
+                    .catch((error) => {
+                        setMessage(`Information of ${newName} has already been removed from the server`)
+                        setMessageStatus('error')
+                    })
 
                 setMessage(`Changed number of ${newName}`)
+                setMessageStatus('success')
             }
         } else {
             personService
@@ -34,10 +40,12 @@ const InputForm = ({ persons, setPersons }) => {
 
             setPersons(persons.concat(personObject))
             setMessage(`Added ${newName}`)
+            setMessageStatus('success')
         }
 
         setTimeout(() => {
             setMessage(null)
+            setMessageStatus('')
         }, 5000)
 
         setNewName('')
@@ -54,7 +62,7 @@ const InputForm = ({ persons, setPersons }) => {
 
     return (
         <form onSubmit={addPerson}>
-            <Notification message={message} />
+            <Notification message={message} className={messageStatus} />
             <div>
                 name: <input value={newName} onChange={handleNameChange}/>
             </div>
