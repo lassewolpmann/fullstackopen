@@ -1,9 +1,11 @@
 import { useState } from "react";
 import personService from "../services/persons";
+import Notification from "./Notification.jsx";
 
 const InputForm = ({ persons, setPersons }) => {
     const [newName, setNewName] = useState('')
     const [newNumber, setNewNumber] = useState('')
+    const [message, setMessage] = useState(null)
 
     const addPerson = (event) => {
         event.preventDefault()
@@ -23,13 +25,20 @@ const InputForm = ({ persons, setPersons }) => {
 
                 personService
                     .update(duplicate.id, personObject)
+
+                setMessage(`Changed number of ${newName}`)
             }
         } else {
             personService
                 .create(personObject)
 
             setPersons(persons.concat(personObject))
+            setMessage(`Added ${newName}`)
         }
+
+        setTimeout(() => {
+            setMessage(null)
+        }, 5000)
 
         setNewName('')
         setNewNumber('')
@@ -45,6 +54,7 @@ const InputForm = ({ persons, setPersons }) => {
 
     return (
         <form onSubmit={addPerson}>
+            <Notification message={message} />
             <div>
                 name: <input value={newName} onChange={handleNameChange}/>
             </div>
