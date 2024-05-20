@@ -6,6 +6,7 @@ import countryService from "./services/countries";
 function App() {
   const [country, setCountry] = useState('')
   const [countries, setCountries] = useState([])
+  const [selectedCountry, setSelectedCountry] = useState(null)
 
   const hook = () => {
     countryService
@@ -17,8 +18,9 @@ function App() {
 
   return (
     <>
-      <InputForm country={country} setCountry={setCountry} />
-      <Countries countries={countries} filter={country} />
+      <InputForm country={country} setCountry={setCountry} setSelectedCountry={setSelectedCountry} />
+      <Countries countries={countries} filter={country} selectedCountry={selectedCountry}
+                 setSelectedCountry={setSelectedCountry} />
     </>
   )
 }

@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 const DetailedCountry = ({ country }) => {
     const name = country["name"]["common"]
     const capitals = country["capital"]
@@ -24,11 +26,15 @@ const DetailedCountry = ({ country }) => {
     )
 }
 
-const Country = ({ country }) => (
-    <p>{country["name"]["common"]}</p>
-)
+const Country = ({ country, setSelectedCountry }) => {
+    const handleClick = () => setSelectedCountry(country)
 
-const Countries = ({ countries, filter }) => {
+    return (
+        <p>{country["name"]["common"]} <button onClick={handleClick}>show</button></p>
+    )
+}
+
+const Countries = ({ countries, filter, selectedCountry, setSelectedCountry }) => {
     const filteredCountries = countries.filter((country) => {
         const name = country["name"]["common"].toLowerCase()
 
@@ -41,15 +47,18 @@ const Countries = ({ countries, filter }) => {
         )
     } else if (filteredCountries.length === 1) {
         return (
-            <>
-                <DetailedCountry country={filteredCountries[0]} />
-            </>
+            <DetailedCountry country={filteredCountries[0]} />
+        )
+    } else if (selectedCountry) {
+        return (
+            <DetailedCountry country={selectedCountry} />
         )
     } else {
         return (
             <>
                 {filteredCountries.map(country =>
-                    <Country key={country["cca2"]} country={country} />
+                    <Country key={country["cca2"]} country={country} selectedCountry={selectedCountry}
+                             setSelectedCountry={setSelectedCountry} />
                 )}
             </>
         )

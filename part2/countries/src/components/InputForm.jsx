@@ -1,6 +1,7 @@
-const InputForm = ({ country, setCountry }) => {
+const InputForm = ({ country, setCountry, setSelectedCountry }) => {
     const handleChange = (event) => {
         setCountry(event.target.value);
+        setSelectedCountry(null);
     }
 
     return (
