@@ -64,9 +64,22 @@ app.post('/api/persons', (request, response) => {
     const id = Math.floor(Math.random() * maxID)
     const body = request.body
 
-    if (!body.name || !body.number) {
+    if (!body.name) {
         return response.status(400).json({
-            error: 'name or number missing'
+            error: 'name is missing'
+        })
+    }
+
+    if (!body.number) {
+        return response.status(400).json({
+            error: 'number is missing'
+        })
+    }
+
+    let allNames = persons.map(person => person.name.toLowerCase())
+    if (allNames.includes(body.name.toLowerCase())) {
+        return response.status(400).json({
+            error: 'name must be unique'
         })
     }
 
