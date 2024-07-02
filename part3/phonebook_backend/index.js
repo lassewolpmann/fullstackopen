@@ -21,6 +21,8 @@ app.use(morgan((tokens, req, res) => {
 app.use(cors())
 app.use(express.static('dist'))
 
+
+
 app.get('/', (request, response) => {
     response.send('<h1>Phonebook API</h1>')
 })
@@ -39,7 +41,7 @@ app.get('/info', (request, response) => {
     response.send(`<p>Phonebook has info for ${total_people} people</p><p>${date}</p>`)
 })
 
-app.get('/api/persons/:id', (request, response) => {
+app.get('/api/persons/:id', (request, response, next) => {
     const id = request.params.id
     phonebookEntry.findById(id)
         .then(entry => {
@@ -49,11 +51,12 @@ app.get('/api/persons/:id', (request, response) => {
                 response.status(404).end()
             }
         })
+        .catch(error => next(error))
 })
 
 app.delete('/api/persons/:id', (request, response) => {
     const id = request.params.id
-    phonebookEntry.deleteOne({ _id: id } )
+    phonebookEntry.findByIdAndDelete(id)
         .then(request => {
             console.log("Delete entry with ID: ", id)
         })
@@ -97,6 +100,24 @@ app.post('/api/persons', (request, response) => {
                 })
         })
 })
+
+const unknownEndpoint = (request, response) => {
+    response.status(404).send({ error: 'unknown endpoint' })
+}
+
+app.use(unknownEndpoint)
+
+const errorHandler = (error, request, response, next) => {
+    console.error(error.message)
+
+    if (error.name === 'CastError') {
+        return response.status(400).send({ error: 'malformatted id' })
+    }
+
+    next(error)
+}
+
+app.use(errorHandler)
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {
