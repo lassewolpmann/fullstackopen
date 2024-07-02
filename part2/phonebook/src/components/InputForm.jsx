@@ -37,10 +37,16 @@ const InputForm = ({ persons, setPersons }) => {
         } else {
             personService
                 .create(personObject)
-
-            setPersons(persons.concat(personObject))
-            setMessage(`Added ${newName}`)
-            setMessageStatus('success')
+                .then(createdPerson => {
+                    setPersons(persons.concat(createdPerson))
+                    setMessage(`Added ${newName}`)
+                    setMessageStatus('success')
+                })
+                .catch(error => {
+                    const errorMessage = error.response.data.error
+                    setMessage(errorMessage)
+                    setMessageStatus('error')
+                })
         }
 
         setTimeout(() => {
