@@ -16,6 +16,16 @@ test('6 notes are returned as json', async () => {
     assert.strictEqual(blogs.length, 6)
 })
 
+test('identifier property is named id', async() => {
+    const res = await api.get('/api/blogs')
+    const blogs = res.body
+
+    for (const blog of blogs) {
+        const keys = Object.keys(blog)
+        assert(keys.includes('id'))
+    }
+})
+
 after(async () => {
     await mongoose.connection.close()
 })
