@@ -81,6 +81,17 @@ test('missing likes property', async () => {
     assert.deepStrictEqual(newestBlog.likes, 0)
 })
 
+test('missing title or url property', async () => {
+    const newBlogPost = {
+        likes: 10
+    }
+
+    await api
+        .post('/api/blogs')
+        .send(newBlogPost)
+        .expect(400)
+})
+
 after(async () => {
     await mongoose.connection.close()
 })
