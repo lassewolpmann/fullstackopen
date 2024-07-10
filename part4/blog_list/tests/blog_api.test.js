@@ -47,21 +47,38 @@ test('create new blog entry', async () => {
         likes: 333
     }
 
-    const res = await api
+    await api
         .post('/api/blogs')
         .send(newBlogPost)
         .expect(201)
         .expect('Content-Type', /application\/json/)
 
-    const data = res.toJSON().req.data
-    assert.deepStrictEqual(newBlogPost.title, data.title)
-    assert.deepStrictEqual(newBlogPost.author, data.author)
-    assert.deepStrictEqual(newBlogPost.url, data.url)
-    assert.deepStrictEqual(newBlogPost.likes, data.likes)
-
     const blogsAfterPost = await helper.blogsInDb()
+    const newestBlog = blogsAfterPost[blogsAfterPost.length - 1]
+    assert.deepStrictEqual(newBlogPost.title, newestBlog.title)
+    assert.deepStrictEqual(newBlogPost.author, newestBlog.author)
+    assert.deepStrictEqual(newBlogPost.url, newestBlog.url)
+    assert.deepStrictEqual(newBlogPost.likes, newestBlog.likes)
 
     assert.strictEqual(blogsAfterPost.length, helper.initialBlogs.length + 1)
+})
+
+test('missing likes property', async () => {
+    const newBlogPost = {
+        title: 'Test Blog Post 3',
+        author: 'Test Author 3',
+        url: 'test'
+    }
+
+    await api
+        .post('/api/blogs')
+        .send(newBlogPost)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+
+    const blogsAfterPost = await helper.blogsInDb()
+    const newestBlog = blogsAfterPost[blogsAfterPost.length - 1]
+    assert.deepStrictEqual(newestBlog.likes, 0)
 })
 
 after(async () => {
