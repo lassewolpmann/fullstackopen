@@ -92,7 +92,7 @@ test('missing title or url property', async () => {
         .expect(400)
 })
 
-test('delete blog post with ID', async() => {
+test('delete blog post with ID', async () => {
     let blogsBeforeDeletion = await helper.blogsInDb()
     let id = blogsBeforeDeletion[0].id
 
@@ -103,6 +103,24 @@ test('delete blog post with ID', async() => {
     let blogsAfterDeletion = await helper.blogsInDb()
 
     assert.deepStrictEqual(blogsAfterDeletion.length, blogsBeforeDeletion.length - 1)
+})
+
+test('update blog post with ID', async () => {
+    let blogsBeforeUpdate = await helper.blogsInDb()
+    let blog = blogsBeforeUpdate[0]
+
+    const newBlogPost =  {
+        title: blog.title,
+        author: blog.author,
+        url: blog.url,
+        likes: blog.likes + 1,
+    }
+
+    const res = await api
+        .put(`/api/blogs/${blog.id}`)
+        .send(newBlogPost)
+
+    assert.deepStrictEqual(res.body.likes, newBlogPost.likes)
 })
 
 after(async () => {
