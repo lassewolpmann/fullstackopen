@@ -92,6 +92,19 @@ test('missing title or url property', async () => {
         .expect(400)
 })
 
+test('delete blog post with ID', async() => {
+    let blogsBeforeDeletion = await helper.blogsInDb()
+    let id = blogsBeforeDeletion[0].id
+
+    await api
+        .delete(`/api/blogs/${id}`)
+        .expect(204)
+
+    let blogsAfterDeletion = await helper.blogsInDb()
+
+    assert.deepStrictEqual(blogsAfterDeletion.length, blogsBeforeDeletion.length - 1)
+})
+
 after(async () => {
     await mongoose.connection.close()
 })
