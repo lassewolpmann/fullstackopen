@@ -9,6 +9,8 @@ const Blog = require('../models/blogSchema')
 const User = require('../models/userSchema')
 const helper = require('./test_helper')
 
+let token = ''
+
 beforeEach(async () => {
     await Blog.deleteMany({})
     console.log('cleared blogs')
@@ -37,6 +39,16 @@ beforeEach(async () => {
 
         console.log('saved blog')
     }
+
+    const res = await api
+        .post('/api/login')
+        .send({
+            username: 'root',
+            password: 'secretHash'
+        })
+        .expect('Content-Type', /application\/json/)
+
+    token = res.body.token
 
     console.log('done')
 })
@@ -71,6 +83,7 @@ test('create new blog entry', async () => {
     await api
         .post('/api/blogs')
         .send(newBlogPost)
+        .set('Authorization', 'Bearer ' + token)
         .expect(201)
         .expect('Content-Type', /application\/json/)
 
@@ -94,6 +107,7 @@ test('missing likes property', async () => {
     await api
         .post('/api/blogs')
         .send(newBlogPost)
+        .set('Authorization', 'Bearer ' + token)
         .expect(201)
         .expect('Content-Type', /application\/json/)
 
@@ -110,6 +124,7 @@ test('missing title or url property', async () => {
     await api
         .post('/api/blogs')
         .send(newBlogPost)
+        .set('Authorization', 'Bearer ' + token)
         .expect(400)
 })
 
@@ -205,6 +220,28 @@ test('password too short', async () => {
     assert(result.body.error.includes('Password must be at least 3 characters'))
 
     assert.strictEqual(usersAtEnd.length, usersAtStart.length)
+})
+
+test('missing or invalid token', async () => {
+    const blogsBeforePost = await helper.blogsInDb()
+
+    const newBlogPost = {
+        title: 'Invalid Token Blog Post',
+        author: 'Unauthorized Person',
+        url: 'test',
+        likes: 666
+    }
+
+    await api
+        .post('/api/blogs')
+        .send(newBlogPost)
+        .set('Authorization', 'Bearer invalidtoken')
+        .expect(401)
+        .expect('Content-Type', /application\/json/)
+
+    const blogsAfterPost = await helper.blogsInDb()
+
+    assert.strictEqual(blogsBeforePost.length, blogsAfterPost.length)
 })
 
 after(async () => {
