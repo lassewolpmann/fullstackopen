@@ -16,17 +16,28 @@ beforeEach(async () => {
     await User.deleteMany({})
     console.log('cleared users')
 
-    for (const blog of helper.initialBlogs) {
-        let blogObject = new Blog(blog)
-        await blogObject.save()
-        console.log('saved blog')
-    }
-
     const passwordHash = await bcrypt.hash('secretHash', 10)
     const rootUser = new User({ username: 'root', password: passwordHash, name: 'Superuser' })
 
     await rootUser.save()
     console.log('saved root user')
+
+    for (const blog of helper.initialBlogs) {
+        let blogObject = new Blog({
+            title: blog.title,
+            author: blog.author,
+            url: blog.url,
+            likes: blog.likes,
+            user: rootUser._id
+        })
+        const savedBlog = await blogObject.save()
+
+        rootUser.blogs = rootUser.blogs.concat(savedBlog._id)
+        await rootUser.save()
+
+        console.log('saved blog')
+    }
+
     console.log('done')
 })
 

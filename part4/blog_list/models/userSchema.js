@@ -12,14 +12,12 @@ const userSchema = new mongoose.Schema({
         required: true
     },
     name: String,
-    /*
     blogs: [
         {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Blog'
         }
     ]
-    */
 })
 
 userSchema.set('toJSON', {
@@ -31,6 +29,6 @@ userSchema.set('toJSON', {
     }
 })
 
-const UserSchema = mongoose.model('UserSchema', userSchema)
+const UserSchema = mongoose.model('User', userSchema)
 
 module.exports = UserSchema
