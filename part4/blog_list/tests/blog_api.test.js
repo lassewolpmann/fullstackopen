@@ -23,7 +23,7 @@ beforeEach(async () => {
     }
 
     const passwordHash = await bcrypt.hash('secretHash', 10)
-    const rootUser = new User({ username: 'root', password: passwordHash })
+    const rootUser = new User({ username: 'root', password: passwordHash, name: 'Superuser' })
 
     await rootUser.save()
     console.log('saved root user')
@@ -153,6 +153,47 @@ test('creating new user', async () => {
 
     const usernames = usersAtEnd.map(user => user.username)
     assert(usernames.includes(newUser.username))
+})
+
+test('test non-unique username', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    const newUser = {
+        username: usersAtStart[0].username,
+        password: 'secretpassword',
+        name: usersAtStart[0].name
+    }
+
+    const result = await api
+        .post('/api/users')
+        .send(newUser)
+        .expect(400)
+        .expect('Content-Type', /application\/json/)
+
+    const usersAtEnd = await helper.usersInDb()
+    assert(result.body.error.includes('expected `username` to be unique'))
+
+    assert.strictEqual(usersAtEnd.length, usersAtStart.length)
+})
+
+test('password too short', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    const newUser = {
+        username: 'insecureUser',
+        password: 'ab'
+    }
+
+    const result = await api
+        .post('/api/users')
+        .send(newUser)
+        .expect(400)
+        .expect('Content-Type', /application\/json/)
+
+    const usersAtEnd = await helper.usersInDb()
+    assert(result.body.error.includes('Password must be at least 3 characters'))
+
+    assert.strictEqual(usersAtEnd.length, usersAtStart.length)
 })
 
 after(async () => {
