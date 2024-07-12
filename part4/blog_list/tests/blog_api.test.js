@@ -2,21 +2,31 @@ const { test, after, beforeEach } = require('node:test')
 const assert = require('node:assert')
 const mongoose = require('mongoose')
 const supertest = require('supertest')
+const bcrypt = require('bcrypt')
 const app = require('../app')
 const api = supertest(app)
 const Blog = require('../models/blogSchema')
+const User = require('../models/userSchema')
 const helper = require('./test_helper')
 
 beforeEach(async () => {
     await Blog.deleteMany({})
     console.log('cleared blogs')
 
+    await User.deleteMany({})
+    console.log('cleared users')
+
     for (const blog of helper.initialBlogs) {
         let blogObject = new Blog(blog)
         await blogObject.save()
-        console.log('saved')
+        console.log('saved blog')
     }
 
+    const passwordHash = await bcrypt.hash('secretHash', 10)
+    const rootUser = new User({ username: 'root', password: passwordHash })
+
+    await rootUser.save()
+    console.log('saved root user')
     console.log('done')
 })
 
@@ -78,7 +88,7 @@ test('missing likes property', async () => {
 
     const blogsAfterPost = await helper.blogsInDb()
     const newestBlog = blogsAfterPost[blogsAfterPost.length - 1]
-    assert.deepStrictEqual(newestBlog.likes, 0)
+    assert.strictEqual(newestBlog.likes, 0)
 })
 
 test('missing title or url property', async () => {
@@ -102,7 +112,7 @@ test('delete blog post with ID', async () => {
 
     let blogsAfterDeletion = await helper.blogsInDb()
 
-    assert.deepStrictEqual(blogsAfterDeletion.length, blogsBeforeDeletion.length - 1)
+    assert.strictEqual(blogsAfterDeletion.length, blogsBeforeDeletion.length - 1)
 })
 
 test('update blog post with ID', async () => {
@@ -120,7 +130,29 @@ test('update blog post with ID', async () => {
         .put(`/api/blogs/${blog.id}`)
         .send(newBlogPost)
 
-    assert.deepStrictEqual(res.body.likes, newBlogPost.likes)
+    assert.strictEqual(res.body.likes, newBlogPost.likes)
+})
+
+test('creating new user', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    const newUser = {
+        username: 'lwolpmann',
+        password: 'secretpassword',
+        name: 'Lasse Wolpmann'
+    }
+
+    await api
+        .post('/api/users')
+        .send(newUser)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+
+    const usersAtEnd = await helper.usersInDb()
+    assert.strictEqual(usersAtEnd.length, usersAtStart.length + 1)
+
+    const usernames = usersAtEnd.map(user => user.username)
+    assert(usernames.includes(newUser.username))
 })
 
 after(async () => {
