@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
+import Notification from "./components/Notification"
 import blogService from './services/blogs'
 import loginService from './services/login'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
-  const [errorMessage, setErrorMessage] = useState(null)
+  const [message, setMessage] = useState(null)
+  const [messageStatus, setMessageStatus] = useState('')
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
@@ -45,10 +47,16 @@ const App = () => {
       setUser(user)
       setUsername('')
       setPassword('')
-    } catch (exception) {
-      setErrorMessage('Wrong credentials')
+      setMessage(`Logged in as ${user.username}`)
+      setMessageStatus('success')
       setTimeout(() => {
-        setErrorMessage(null)
+        setMessage(null)
+      }, 5000)
+    } catch (exception) {
+      setMessage('Wrong credentials')
+      setMessageStatus('error')
+      setTimeout(() => {
+        setMessage(null)
       }, 5000)
     }
   }
@@ -57,6 +65,11 @@ const App = () => {
     event.preventDefault()
     window.localStorage.removeItem('loggedBlogAppUser')
     setUser(null)
+    setMessage('Logged out')
+    setMessageStatus('success')
+    setTimeout(() => {
+      setMessage(null)
+    }, 5000)
   }
 
   const newBlog = async (event) => {
@@ -69,12 +82,23 @@ const App = () => {
 
       console.log(newBlog)
 
+      setMessage(`Added new blog: ${blogTitle} by ${blogAuthor}`)
+      setMessageStatus('success')
+      setTimeout(() => {
+        setMessage(null)
+      }, 5000)
+
       setBlogs(blogs.concat(newBlog))
       setBlogTitle('')
       setBlogAuthor('')
       setBlogURL('')
     } catch (e) {
       console.log(e)
+      setMessage(`Error adding new blog: ${e.response.data.error}`)
+      setMessageStatus('error')
+      setTimeout(() => {
+        setMessage(null)
+      }, 5000)
     }
   }
 
@@ -82,6 +106,7 @@ const App = () => {
     return (
         <div>
           <h2>Log in to application</h2>
+          <Notification message={message} className={messageStatus} />
           <form onSubmit={handleLogin}>
             <div>
               username
@@ -110,6 +135,7 @@ const App = () => {
   return (
       <div>
         <h2>blogs</h2>
+        <Notification message={message} className={messageStatus} />
         <p>{user.username} logged in <button onClick={handleLogout}>logout</button></p>
         {blogs.map(blog =>
             <Blog key={blog.id} blog={blog}/>
