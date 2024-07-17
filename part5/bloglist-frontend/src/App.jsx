@@ -89,6 +89,18 @@ const App = () => {
           <Notification message={message} className={messageStatus} />
           <p>{user.username} logged in <button onClick={handleLogout}>logout</button></p>
 
+          <Toggleable buttonLabel="new blog post" ref={blogFormRef}>
+            <NewBlogForm
+                newBlog={newBlog}
+                blogTitle={blogTitle}
+                setBlogTitle={setBlogTitle}
+                blogAuthor={blogAuthor}
+                setBlogAuthor={setBlogAuthor}
+                blogURL={blogURL}
+                setBlogURL={setBlogURL}
+            />
+          </Toggleable>
+
           {blogs
               .sort((a, b) => {
                 if (a.likes < b.likes) {
@@ -100,20 +112,8 @@ const App = () => {
                 }
               })
               .map(blog =>
-              <Blog key={blog.id} blog={blog} blogs={blogs} setBlogs={setBlogs} />
+              <Blog key={blog.id} blog={blog} setBlogs={setBlogs} user={user} />
           )}
-
-          <Toggleable buttonLabel="new note" ref={blogFormRef}>
-            <NewBlogForm
-                newBlog={newBlog}
-                blogTitle={blogTitle}
-                setBlogTitle={setBlogTitle}
-                blogAuthor={blogAuthor}
-                setBlogAuthor={setBlogAuthor}
-                blogURL={blogURL}
-                setBlogURL={setBlogURL}
-            />
-          </Toggleable>
         </div>
     )
   }
