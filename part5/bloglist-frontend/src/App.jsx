@@ -82,30 +82,31 @@ const App = () => {
         messageStatus={messageStatus}
         setMessageStatus={setMessageStatus}
     />
+  } else {
+    return (
+        <div>
+          <h2>blogs</h2>
+          <Notification message={message} className={messageStatus} />
+          <p>{user.username} logged in <button onClick={handleLogout}>logout</button></p>
+          {blogs.map(blog =>
+              <Blog key={blog.id} blog={blog}/>
+          )}
+
+          <Toggleable buttonLabel="new note" ref={blogFormRef}>
+            <NewBlogForm
+                newBlog={newBlog}
+                blogTitle={blogTitle}
+                setBlogTitle={setBlogTitle}
+                blogAuthor={blogAuthor}
+                setBlogAuthor={setBlogAuthor}
+                blogURL={blogURL}
+                setBlogURL={setBlogURL}
+            />
+          </Toggleable>
+        </div>
+    )
   }
 
-  return (
-      <div>
-        <h2>blogs</h2>
-        <Notification message={message} className={messageStatus} />
-        <p>{user.username} logged in <button onClick={handleLogout}>logout</button></p>
-        {blogs.map(blog =>
-            <Blog key={blog.id} blog={blog}/>
-        )}
-
-        <Toggleable buttonLabel="new note" ref={blogFormRef}>
-          <NewBlogForm
-              newBlog={newBlog}
-              blogTitle={blogTitle}
-              setBlogTitle={setBlogTitle}
-              blogAuthor={blogAuthor}
-              setBlogAuthor={setBlogAuthor}
-              blogURL={blogURL}
-              setBlogURL={setBlogURL}
-          />
-        </Toggleable>
-      </div>
-  )
 }
 
 export default App
