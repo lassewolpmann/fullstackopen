@@ -22,7 +22,7 @@ const App = () => {
   useEffect(() => {
     blogService.getAll().then(blogs =>
       setBlogs( blogs )
-    )  
+    )
   }, [])
 
   useEffect(() => {
@@ -89,7 +89,7 @@ const App = () => {
           <Notification message={message} className={messageStatus} />
           <p>{user.username} logged in <button onClick={handleLogout}>logout</button></p>
           {blogs.map(blog =>
-              <Blog key={blog.id} blog={blog}/>
+              <Blog key={blog.id} blog={blog} blogs={blogs} setBlogs={setBlogs} />
           )}
 
           <Toggleable buttonLabel="new note" ref={blogFormRef}>
