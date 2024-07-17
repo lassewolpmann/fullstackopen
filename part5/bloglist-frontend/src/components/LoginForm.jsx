@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState } from 'react'
+import PropTypes from 'prop-types'
 
 import loginService from '../services/login'
-import Notification from "./Notification.jsx";
+import Notification from './Notification.jsx'
 
 const LoginForm = ({
     setUser,
@@ -9,7 +10,7 @@ const LoginForm = ({
     setMessage,
     messageStatus,
     setMessageStatus
-    }) => {
+}) => {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
 
@@ -54,7 +55,7 @@ const LoginForm = ({
                         type="text"
                         value={username}
                         name="Username"
-                        onChange={({target}) => setUsername(target.value)}
+                        onChange={({ target }) => setUsername(target.value)}
                     />
                 </div>
                 <div>
@@ -63,7 +64,7 @@ const LoginForm = ({
                         type="password"
                         value={password}
                         name="Password"
-                        onChange={({target}) => setPassword(target.value)}
+                        onChange={({ target }) => setPassword(target.value)}
                     />
                 </div>
                 <button type="submit">login</button>
@@ -72,4 +73,11 @@ const LoginForm = ({
     )
 }
 
+LoginForm.propTypes = {
+    setUser: PropTypes.func.isRequired,
+    message: PropTypes.string,
+    setMessage: PropTypes.func.isRequired,
+    messageStatus: PropTypes.string.isRequired,
+    setMessageStatus: PropTypes.func.isRequired
+}
 export default LoginForm

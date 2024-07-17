@@ -1,20 +1,20 @@
-import { useState } from "react";
+import { useState } from 'react'
 
-import blogService from "../services/blogs"
+import blogService from '../services/blogs'
 
 const Blog = ({ blog, setBlogs, user }) => {
     const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: 'solid',
-    borderWidth: 1,
-    marginBottom: 5
+        paddingTop: 10,
+        paddingLeft: 2,
+        border: 'solid',
+        borderWidth: 1,
+        marginBottom: 5
     }
 
     const [showDetails, setShowDetails] = useState(false)
 
     const visible = { display: showDetails ? '' : 'none' }
-    const buttonVisible = { display: user.username === blog.user.username ? "" : "none" }
+    const buttonVisible = { display: user.username === blog.user.username ? '' : 'none' }
 
     const likeBlogPost = async () => {
         try {
@@ -44,13 +44,13 @@ const Blog = ({ blog, setBlogs, user }) => {
 
     return (
         <div style={blogStyle}>
-        <p>{blog.title} {blog.author}
-          <button onClick={() => setShowDetails(!showDetails)}>{showDetails ? "hide" : "show"}</button>
-        </p>
-        <p style={visible}>{blog.url}</p>
-        <p style={visible}>likes {blog.likes} <button onClick={likeBlogPost}>like</button></p>
-        <p style={visible}>{blog.author}</p>
-        <button style={buttonVisible} onClick={deletePost}>delete</button>
+            <p>{blog.title} {blog.author}
+                <button onClick={() => setShowDetails(!showDetails)}>{showDetails ? 'hide' : 'show'}</button>
+            </p>
+            <p style={visible}>{blog.url}</p>
+            <p style={visible}>likes {blog.likes} <button onClick={likeBlogPost}>like</button></p>
+            <p style={visible}>{blog.author}</p>
+            <button style={buttonVisible} onClick={deletePost}>delete</button>
         </div>
     )
 }
