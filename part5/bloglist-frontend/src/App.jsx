@@ -1,20 +1,23 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import Notification from "./components/Notification"
+import LoginForm from "./components/LoginForm"
+import NewBlogForm from "./components/NewBlogForm"
+import Toggleable from "./components/Toggleable"
+
 import blogService from './services/blogs'
-import loginService from './services/login'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [message, setMessage] = useState(null)
   const [messageStatus, setMessageStatus] = useState('')
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
 
   const [blogTitle, setBlogTitle] = useState('')
   const [blogAuthor, setBlogAuthor] = useState('')
   const [blogURL, setBlogURL] = useState('')
+
+  const blogFormRef = useRef()
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -31,36 +34,6 @@ const App = () => {
     }
   }, [])
 
-  const handleLogin = async (event) => {
-    event.preventDefault()
-    console.log('logging in with', username, password)
-
-    try {
-      const user = await loginService.login({
-        username, password,
-      })
-
-      window.localStorage.setItem(
-          'loggedBlogAppUser', JSON.stringify(user)
-      )
-
-      setUser(user)
-      setUsername('')
-      setPassword('')
-      setMessage(`Logged in as ${user.username}`)
-      setMessageStatus('success')
-      setTimeout(() => {
-        setMessage(null)
-      }, 5000)
-    } catch (exception) {
-      setMessage('Wrong credentials')
-      setMessageStatus('error')
-      setTimeout(() => {
-        setMessage(null)
-      }, 5000)
-    }
-  }
-
   const handleLogout = (event) => {
     event.preventDefault()
     window.localStorage.removeItem('loggedBlogAppUser')
@@ -74,13 +47,12 @@ const App = () => {
 
   const newBlog = async (event) => {
     event.preventDefault()
+    blogFormRef.current.toggleVisibility()
 
     try {
       const newBlog = await blogService.create({
         title: blogTitle, author: blogAuthor, url: blogURL
       })
-
-      console.log(newBlog)
 
       setMessage(`Added new blog: ${blogTitle} by ${blogAuthor}`)
       setMessageStatus('success')
@@ -103,33 +75,13 @@ const App = () => {
   }
 
   if (user === null) {
-    return (
-        <div>
-          <h2>Log in to application</h2>
-          <Notification message={message} className={messageStatus} />
-          <form onSubmit={handleLogin}>
-            <div>
-              username
-              <input
-                  type="text"
-                  value={username}
-                  name="Username"
-                  onChange={({target}) => setUsername(target.value)}
-              />
-            </div>
-            <div>
-              password
-              <input
-                  type="password"
-                  value={password}
-                  name="Password"
-                  onChange={({target}) => setPassword(target.value)}
-              />
-            </div>
-            <button type="submit">login</button>
-          </form>
-        </div>
-    )
+    return <LoginForm
+        setUser={setUser}
+        message={message}
+        setMessage={setMessage}
+        messageStatus={messageStatus}
+        setMessageStatus={setMessageStatus}
+    />
   }
 
   return (
@@ -141,37 +93,17 @@ const App = () => {
             <Blog key={blog.id} blog={blog}/>
         )}
 
-        <h2>create new</h2>
-        <form onSubmit={newBlog}>
-          <div>
-            title:
-            <input
-                type="text"
-                value={blogTitle}
-                name="Blog Title"
-                onChange={({target}) => setBlogTitle(target.value)}
-            />
-          </div>
-          <div>
-            author:
-            <input
-                type="text"
-                value={blogAuthor}
-                name="Blog Author"
-                onChange={({target}) => setBlogAuthor(target.value)}
-            />
-          </div>
-          <div>
-            url:
-            <input
-                type="text"
-                value={blogURL}
-                name="Blog URL"
-                onChange={({target}) => setBlogURL(target.value)}
-            />
-          </div>
-          <button type="submit">create</button>
-        </form>
+        <Toggleable buttonLabel="new note" ref={blogFormRef}>
+          <NewBlogForm
+              newBlog={newBlog}
+              blogTitle={blogTitle}
+              setBlogTitle={setBlogTitle}
+              blogAuthor={blogAuthor}
+              setBlogAuthor={setBlogAuthor}
+              blogURL={blogURL}
+              setBlogURL={setBlogURL}
+          />
+        </Toggleable>
       </div>
   )
 }
