@@ -20,9 +20,13 @@ const App = () => {
     const blogFormRef = useRef()
 
     useEffect(() => {
-        blogService.getAll().then(blogs =>
-            setBlogs( blogs )
-        )
+        const fetchBlogs = async () => {
+            const fetchedBlogs = await blogService.getAll()
+            setBlogs(fetchedBlogs)
+        }
+
+        fetchBlogs()
+            .catch(console.error)
     }, [])
 
     useEffect(() => {
@@ -38,6 +42,7 @@ const App = () => {
         event.preventDefault()
         window.localStorage.removeItem('loggedBlogAppUser')
         setUser(null)
+        blogService.setToken(null)
         setMessage('Logged out')
         setMessageStatus('success')
         setTimeout(() => {
@@ -60,7 +65,7 @@ const App = () => {
                 setMessage(null)
             }, 5000)
 
-            setBlogs(blogs.concat(newBlog))
+            setBlogs([...blogs, newBlog])
             setBlogTitle('')
             setBlogAuthor('')
             setBlogURL('')

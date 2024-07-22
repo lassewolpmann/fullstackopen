@@ -13,9 +13,6 @@ const Blog = ({ blog, setBlogs, user }) => {
 
     const [showDetails, setShowDetails] = useState(false)
 
-    const visible = { display: showDetails ? '' : 'none' }
-    const buttonVisible = { display: user.username === blog.user.username ? '' : 'none' }
-
     const likeBlogPost = async () => {
         try {
             await blogService.likePost(blog.id, blog.likes + 1)
@@ -43,14 +40,15 @@ const Blog = ({ blog, setBlogs, user }) => {
     }
 
     return (
-        <div style={blogStyle}>
-            <p>{blog.title} {blog.author}
+        <div style={blogStyle} className='blog'>
+            <p>
+                <span data-testid="blog-title">{blog.title}</span> <span data-testid="blog-author">{blog.author}</span>
                 <button onClick={() => setShowDetails(!showDetails)}>{showDetails ? 'hide' : 'show'}</button>
             </p>
-            <p style={visible}>{blog.url}</p>
-            <p style={visible}>likes {blog.likes} <button onClick={likeBlogPost}>like</button></p>
-            <p style={visible}>{blog.author}</p>
-            <button style={buttonVisible} onClick={deletePost}>delete</button>
+            {showDetails && <p data-testid="blog-url">{blog.url}</p>}
+            {showDetails && <p data-testid="blog-likes">likes {blog.likes} <button onClick={likeBlogPost}>like</button></p>}
+            {showDetails && <p data-testid="blog-user">{blog.user.name}</p>}
+            {(user.username === blog.user.username) && <button onClick={deletePost}>delete</button>}
         </div>
     )
 }

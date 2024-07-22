@@ -33,7 +33,6 @@ const deletePost = async (id) => {
     }
 
     const res = await axios.delete(baseUrl + `/${id}`, config)
-    console.log(res)
 }
 
 export default { setToken, getAll, create, likePost, deletePost }
