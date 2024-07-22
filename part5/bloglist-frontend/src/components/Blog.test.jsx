@@ -1,9 +1,12 @@
-import { render, screen } from '@testing-library/react'
+import { render } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import Blog from './Blog'
 
 describe('<Blog />', () => {
     let container
+
+    const likeBlogPost = vi.fn()
+    const user = userEvent.setup()
 
     beforeEach(() => {
         const blog = {
@@ -20,7 +23,7 @@ describe('<Blog />', () => {
             username: 'testUser'
         }
 
-        container = render(<Blog blog={blog} user={user} />).container
+        container = render(<Blog blog={blog} user={user} likeBlogPost={likeBlogPost} />).container
     })
 
     test('renders title and author only', () => {
@@ -38,7 +41,6 @@ describe('<Blog />', () => {
     })
 
     test('show details on button click', async () => {
-        const user = userEvent.setup()
         const button = container.querySelector('.blogDetailsButton')
         await user.click(button)
 
@@ -49,5 +51,16 @@ describe('<Blog />', () => {
         expect(urlEl).toBeInTheDocument()
         expect(likesEl).toBeInTheDocument()
         expect(userEl).toBeInTheDocument()
+    })
+
+    test('pressing like button twice should call event handler twice', async () => {
+        const detailsButton = container.querySelector('.blogDetailsButton')
+        await user.click(detailsButton)
+
+        const likeButton = container.querySelector('.blogLikeButton')
+        await user.click(likeButton)
+        await user.click(likeButton)
+
+        expect(likeBlogPost.mock.calls).toHaveLength(2)
     })
 })

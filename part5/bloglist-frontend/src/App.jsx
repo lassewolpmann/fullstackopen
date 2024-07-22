@@ -79,6 +79,32 @@ const App = () => {
         }
     }
 
+    const likeBlogPost = async (blog) => {
+        try {
+            await blogService.likePost(blog.id, blog.likes + 1)
+            blogService.getAll().then(blogs =>
+                setBlogs( blogs )
+            )
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
+    const deleteBlogPost = async (blog) => {
+        const confirmation = confirm(`Remove blog ${blog.title} by ${blog.author}`)
+
+        if (confirmation) {
+            try {
+                await blogService.deletePost(blog.id)
+                blogService.getAll().then(blogs =>
+                    setBlogs( blogs )
+                )
+            } catch (e) {
+                console.log(e)
+            }
+        }
+    }
+
     if (user === null) {
         return <LoginForm
             setUser={setUser}
@@ -117,7 +143,13 @@ const App = () => {
                         }
                     })
                     .map(blog =>
-                        <Blog key={blog.id} blog={blog} setBlogs={setBlogs} user={user} />
+                        <Blog
+                            key={blog.id}
+                            blog={blog}
+                            user={user}
+                            likeBlogPost={() => likeBlogPost(blog)}
+                            deleteBlogPost={() => deleteBlogPost(blog)}
+                        />
                     )}
             </div>
         )
