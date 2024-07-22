@@ -1,6 +1,7 @@
-import { render } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import Blog from './Blog'
+import NewBlogForm from "./NewBlogForm.jsx";
 
 describe('<Blog />', () => {
     let container
@@ -62,5 +63,35 @@ describe('<Blog />', () => {
         await user.click(likeButton)
 
         expect(likeBlogPost.mock.calls).toHaveLength(2)
+    })
+})
+
+describe('<NewBlogForm />', () => {
+    let container
+
+    const newBlog = vi.fn()
+    const user = userEvent.setup()
+
+    beforeEach(() => {
+        container = render(<NewBlogForm newBlog={newBlog} />).container
+    })
+
+    test('submitting form succeeds with correct prop details', async () => {
+        const titleInput = screen.getByPlaceholderText('write blog title here')
+        const authorInput = screen.getByPlaceholderText('write blog author here')
+        const urlInput = screen.getByPlaceholderText('write blog url here')
+
+        const sendButton = screen.getByText('create')
+
+        await user.type(titleInput, 'test title input...')
+        await user.type(authorInput, 'test author input...')
+        await user.type(urlInput, 'test url input...')
+
+        await user.click(sendButton)
+
+        expect(newBlog.mock.calls).toHaveLength(1)
+        expect(newBlog.mock.calls[0][0].title).toBe('test title input...')
+        expect(newBlog.mock.calls[0][0].author).toBe('test author input...')
+        expect(newBlog.mock.calls[0][0].url).toBe('test url input...')
     })
 })

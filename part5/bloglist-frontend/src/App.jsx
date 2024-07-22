@@ -13,10 +13,6 @@ const App = () => {
     const [messageStatus, setMessageStatus] = useState('')
     const [user, setUser] = useState(null)
 
-    const [blogTitle, setBlogTitle] = useState('')
-    const [blogAuthor, setBlogAuthor] = useState('')
-    const [blogURL, setBlogURL] = useState('')
-
     const blogFormRef = useRef()
 
     useEffect(() => {
@@ -50,25 +46,19 @@ const App = () => {
         }, 5000)
     }
 
-    const newBlog = async (event) => {
-        event.preventDefault()
+    const newBlog = async (blogObject) => {
         blogFormRef.current.toggleVisibility()
 
         try {
-            const newBlog = await blogService.create({
-                title: blogTitle, author: blogAuthor, url: blogURL
-            })
+            const newBlog = await blogService.create(blogObject)
 
-            setMessage(`Added new blog: ${blogTitle} by ${blogAuthor}`)
+            setMessage(`Added new blog: ${newBlog.title} by ${newBlog.author}`)
             setMessageStatus('success')
             setTimeout(() => {
                 setMessage(null)
             }, 5000)
 
             setBlogs([...blogs, newBlog])
-            setBlogTitle('')
-            setBlogAuthor('')
-            setBlogURL('')
         } catch (e) {
             console.log(e)
             setMessage(`Error adding new blog: ${e.response.data.error}`)
@@ -121,15 +111,7 @@ const App = () => {
                 <p>{user.username} logged in <button onClick={handleLogout}>logout</button></p>
 
                 <Toggleable buttonLabel="new blog post" ref={blogFormRef}>
-                    <NewBlogForm
-                        newBlog={newBlog}
-                        blogTitle={blogTitle}
-                        setBlogTitle={setBlogTitle}
-                        blogAuthor={blogAuthor}
-                        setBlogAuthor={setBlogAuthor}
-                        blogURL={blogURL}
-                        setBlogURL={setBlogURL}
-                    />
+                    <NewBlogForm newBlog={newBlog} />
                 </Toggleable>
 
                 {blogs
