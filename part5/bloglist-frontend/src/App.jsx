@@ -6,6 +6,7 @@ import NewBlogForm from './components/NewBlogForm'
 import Toggleable from './components/Toggleable'
 
 import blogService from './services/blogs'
+import loginService from './services/login'
 
 const App = () => {
     const [blogs, setBlogs] = useState([])
@@ -34,6 +35,39 @@ const App = () => {
         }
     }, [])
 
+    const handleLogin = async (userObject) => {
+        console.log(userObject)
+        const username = userObject.username
+        const password = userObject.password
+
+        console.log('logging in with', username, password)
+
+        try {
+            const user = await loginService.login({
+                username, password
+            })
+
+            window.localStorage.setItem(
+                'loggedBlogAppUser', JSON.stringify(user)
+            )
+
+            setUser(user)
+            blogService.setToken(user.token)
+
+            setMessage(`Logged in as ${user.username}`)
+            setMessageStatus('success')
+            setTimeout(() => {
+                setMessage(null)
+            }, 5000)
+        } catch (exception) {
+            setMessage('Wrong credentials')
+            setMessageStatus('error')
+            setTimeout(() => {
+                setMessage(null)
+            }, 5000)
+        }
+    }
+
     const handleLogout = (event) => {
         event.preventDefault()
         window.localStorage.removeItem('loggedBlogAppUser')
@@ -58,7 +92,9 @@ const App = () => {
                 setMessage(null)
             }, 5000)
 
-            setBlogs([...blogs, newBlog])
+            blogService.getAll().then(blogs =>
+                setBlogs( blogs )
+            )
         } catch (e) {
             console.log(e)
             setMessage(`Error adding new blog: ${e.response.data.error}`)
@@ -96,13 +132,12 @@ const App = () => {
     }
 
     if (user === null) {
-        return <LoginForm
-            setUser={setUser}
-            message={message}
-            setMessage={setMessage}
-            messageStatus={messageStatus}
-            setMessageStatus={setMessageStatus}
-        />
+        return (
+            <>
+                <Notification message={message} className={messageStatus} />
+                <LoginForm handleLogin={handleLogin} />
+            </>
+        )
     } else {
         return (
             <div>
@@ -136,7 +171,6 @@ const App = () => {
             </div>
         )
     }
-
 }
 
 export default App

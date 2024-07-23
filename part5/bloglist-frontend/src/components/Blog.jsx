@@ -12,7 +12,7 @@ const Blog = ({ blog, user, likeBlogPost, deleteBlogPost }) => {
     const [showDetails, setShowDetails] = useState(false)
 
     return (
-        <div style={blogStyle} className='blog'>
+        <div style={blogStyle} className='blog' data-testid={blog.title}>
             <p>
                 <span className="blogTitle">{blog.title}</span> <span className="blogAuthor">{blog.author}</span>
                 <button className="blogDetailsButton" onClick={() => setShowDetails(!showDetails)}>{showDetails ? 'hide' : 'show'}</button>

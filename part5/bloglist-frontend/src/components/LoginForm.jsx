@@ -1,56 +1,25 @@
 import { useState } from 'react'
 import PropTypes from 'prop-types'
 
-import loginService from '../services/login'
-import blogService from '../services/blogs'
-import Notification from './Notification.jsx'
-
-const LoginForm = ({
-    setUser,
-    message,
-    setMessage,
-    messageStatus,
-    setMessageStatus
-}) => {
+const LoginForm = ({ handleLogin }) => {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
 
-    const handleLogin = async (event) => {
+    const login = async (event) => {
         event.preventDefault()
-        console.log('logging in with', username, password)
+        handleLogin({
+            username: username,
+            password: password
+        })
 
-        try {
-            const user = await loginService.login({
-                username, password,
-            })
-
-            window.localStorage.setItem(
-                'loggedBlogAppUser', JSON.stringify(user)
-            )
-
-            setUser(user)
-            blogService.setToken(user.token)
-            setUsername('')
-            setPassword('')
-            setMessage(`Logged in as ${user.username}`)
-            setMessageStatus('success')
-            setTimeout(() => {
-                setMessage(null)
-            }, 5000)
-        } catch (exception) {
-            setMessage('Wrong credentials')
-            setMessageStatus('error')
-            setTimeout(() => {
-                setMessage(null)
-            }, 5000)
-        }
+        setUsername('')
+        setPassword('')
     }
 
     return (
         <div>
             <h2>Log in to application</h2>
-            <Notification message={message} className={messageStatus} />
-            <form onSubmit={handleLogin}>
+            <form onSubmit={login}>
                 <div>
                     username
                     <input
@@ -78,10 +47,6 @@ const LoginForm = ({
 }
 
 LoginForm.propTypes = {
-    setUser: PropTypes.func.isRequired,
-    message: PropTypes.string,
-    setMessage: PropTypes.func.isRequired,
-    messageStatus: PropTypes.string.isRequired,
-    setMessageStatus: PropTypes.func.isRequired
+    handleLogin: PropTypes.func.isRequired
 }
 export default LoginForm
