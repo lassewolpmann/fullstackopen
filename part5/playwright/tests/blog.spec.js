@@ -10,6 +10,13 @@ describe('Blog app', () => {
                 name: 'Test User'
             }
         })
+        await request.post('http://localhost:3003/api/users', {
+            data: {
+                username: 'testUser2',
+                password: 'testPassword',
+                name: 'Test User 2'
+            }
+        })
 
         await page.goto('http://localhost:5173')
     })
@@ -75,6 +82,19 @@ describe('Blog app', () => {
 
             const successDiv = await page.locator('.success')
             await expect(successDiv).toContainText('Removed blog: test title by test author')
+        })
+
+        test('login with different user to ensure delete button is only visible for user who created the blog', async ({ page }) => {
+            await page.getByRole('button', { name: 'logout' }).click()
+            const successDiv = await page.locator('.success')
+            await expect(successDiv).toContainText('Logged out')
+
+            await page.getByTestId('username').fill('testUser2')
+            await page.getByTestId('password').fill('testPassword')
+            await page.getByRole('button', { name: 'login' }).click()
+            await expect(page.getByText('Test User 2 logged in')).toBeVisible()
+
+            await expect(page.getByRole('button', { name: 'delete' })).not.toBeVisible()
         })
     })
 })
