@@ -85,16 +85,15 @@ const App = () => {
 
         try {
             const newBlog = await blogService.create(blogObject)
+            blogService.getAll().then(blogs =>
+                setBlogs( blogs )
+            )
 
             setMessage(`Added new blog: ${newBlog.title} by ${newBlog.author}`)
             setMessageStatus('success')
             setTimeout(() => {
                 setMessage(null)
             }, 5000)
-
-            blogService.getAll().then(blogs =>
-                setBlogs( blogs )
-            )
         } catch (e) {
             console.log(e)
             setMessage(`Error adding new blog: ${e.response.data.error}`)
@@ -125,8 +124,19 @@ const App = () => {
                 blogService.getAll().then(blogs =>
                     setBlogs( blogs )
                 )
+
+                setMessage(`Removed blog: ${blog.title} by ${blog.author}`)
+                setMessageStatus('success')
+                setTimeout(() => {
+                    setMessage(null)
+                }, 5000)
             } catch (e) {
                 console.log(e)
+                setMessage(`Error removing blog: ${e.response.data.error}`)
+                setMessageStatus('error')
+                setTimeout(() => {
+                    setMessage(null)
+                }, 5000)
             }
         }
     }

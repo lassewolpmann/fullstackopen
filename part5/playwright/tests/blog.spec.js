@@ -68,5 +68,13 @@ describe('Blog app', () => {
             await page.getByRole('button', { name: 'like' }).click()
             await expect(likes).toContainText('likes 1')
         })
+
+        test('a blog can be deleted by the user who added the blog', async ({ page }) => {
+            page.on('dialog', dialog => dialog.accept())
+            await page.getByRole('button', { name: 'delete' }).click()
+
+            const successDiv = await page.locator('.success')
+            await expect(successDiv).toContainText('Removed blog: test title by test author')
+        })
     })
 })
