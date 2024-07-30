@@ -3,7 +3,6 @@ import axios from 'axios'
 const baseUrl = 'http://localhost:3001/anecdotes'
 
 export const getAnecdotes = () => {
-    console.log('fetching anecdotes')
     return axios.get(baseUrl)
         .then(res => res.data)
 }
