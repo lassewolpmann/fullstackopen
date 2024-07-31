@@ -16,7 +16,7 @@ const CreateNew = ({ addNew, setNotification }) => {
             info: info.value,
             votes: 0
         })
-        setNotification(`a new anecdote ${content} created!`)
+        setNotification(`a new anecdote ${content.value} created!`)
         setTimeout(() => {
             setNotification(null)
         }, 5000)
@@ -36,15 +36,27 @@ const CreateNew = ({ addNew, setNotification }) => {
             <form onSubmit={handleSubmit} onReset={handleReset}>
                 <div>
                     content
-                    <input {...content} />
+                    <input
+                        value={content.value}
+                        type={content.type}
+                        onChange={content.onChange}
+                    />
                 </div>
                 <div>
                     author
-                    <input {...author} />
+                    <input
+                        value={author.value}
+                        type={author.type}
+                        onChange={author.onChange}
+                    />
                 </div>
                 <div>
                     url for more info
-                    <input {...info} />
+                    <input
+                        value={info.value}
+                        type={info.type}
+                        onChange={info.onChange}
+                    />
                 </div>
                 <button type="submit">create</button>
                 <button type="reset">reset</button>
