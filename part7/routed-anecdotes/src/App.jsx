@@ -1,7 +1,15 @@
 import { useState } from 'react'
+import {
+    BrowserRouter as Router,
+    Routes, Route
+} from 'react-router-dom'
 
 import Menu from "./components/Menu.jsx";
 import Footer from "./components/Footer.jsx";
+import AnecdoteList from "./components/AnecdoteList.jsx";
+import CreateNew from "./components/CreateNew.jsx";
+import About from "./components/About.jsx";
+import Anecdote from "./components/Anecdote.jsx";
 
 const App = () => {
   const [anecdotes, setAnecdotes] = useState([
@@ -28,8 +36,7 @@ const App = () => {
     setAnecdotes(anecdotes.concat(anecdote))
   }
 
-  const anecdoteById = (id) =>
-    anecdotes.find(a => a.id === id)
+  const anecdoteById = (id) => anecdotes.find(a => a.id === id)
 
   const vote = (id) => {
     const anecdote = anecdoteById(id)
@@ -43,11 +50,21 @@ const App = () => {
   }
 
   return (
-    <div>
-      <h1>Software anecdotes</h1>
-      <Menu anecdotes={anecdotes} addNew={addNew} />
-      <Footer />
-    </div>
+      <Router>
+          <div>
+              <h1>Software anecdotes</h1>
+              <Menu/>
+          </div>
+
+          <Routes>
+              <Route path="/:id" element={<Anecdote anecdoteById={anecdoteById} />}/>
+              <Route path="/" element={<AnecdoteList anecdotes={anecdotes} />}/>
+              <Route path="/create" element={<CreateNew addNew={addNew} />}/>
+              <Route path="/about" element={<About/>}/>
+          </Routes>
+
+          <Footer/>
+      </Router>
   )
 }
 
