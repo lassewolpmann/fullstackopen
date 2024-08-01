@@ -1,4 +1,7 @@
 import { useState, useEffect, useRef } from "react";
+import { useDispatch } from 'react-redux'
+import { setNotification } from "./reducers/notificationReducer.js";
+
 import Blog from "./components/Blog";
 import Notification from "./components/Notification";
 import LoginForm from "./components/LoginForm";
@@ -10,11 +13,10 @@ import loginService from "./services/login";
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
-  const [message, setMessage] = useState(null);
-  const [messageStatus, setMessageStatus] = useState("");
   const [user, setUser] = useState(null);
 
   const blogFormRef = useRef();
+  const dispatch = useDispatch()
 
   useEffect(() => {
     const fetchBlogs = async () => {
@@ -52,17 +54,9 @@ const App = () => {
       setUser(user);
       blogService.setToken(user.token);
 
-      setMessage(`Logged in as ${user.username}`);
-      setMessageStatus("success");
-      setTimeout(() => {
-        setMessage(null);
-      }, 5000);
+      dispatch(setNotification({ message: `Logged in as ${user.username}`, status: "success" }, 5))
     } catch (exception) {
-      setMessage("Wrong credentials");
-      setMessageStatus("error");
-      setTimeout(() => {
-        setMessage(null);
-      }, 5000);
+      dispatch(setNotification({ message: "Wrong credentials", status: "error" }, 5))
     }
   };
 
@@ -71,11 +65,7 @@ const App = () => {
     window.localStorage.removeItem("loggedBlogAppUser");
     setUser(null);
     blogService.setToken(null);
-    setMessage("Logged out");
-    setMessageStatus("success");
-    setTimeout(() => {
-      setMessage(null);
-    }, 5000);
+    dispatch(setNotification({ message: "Logged out", status: "success" }, 5))
   };
 
   const newBlog = async (blogObject) => {
@@ -85,18 +75,9 @@ const App = () => {
       const newBlog = await blogService.create(blogObject);
       blogService.getAll().then((blogs) => setBlogs(blogs));
 
-      setMessage(`Added new blog: ${newBlog.title} by ${newBlog.author}`);
-      setMessageStatus("success");
-      setTimeout(() => {
-        setMessage(null);
-      }, 5000);
+      dispatch(setNotification({ message: `Added new blog: ${newBlog.title} by ${newBlog.author}`, status: "success" }, 5))
     } catch (e) {
-      console.log(e);
-      setMessage(`Error adding new blog: ${e.response.data.error}`);
-      setMessageStatus("error");
-      setTimeout(() => {
-        setMessage(null);
-      }, 5000);
+      dispatch(setNotification({ message: `Error adding new blog: ${e.response.data.error}`, status: "error" }, 5))
     }
   };
 
@@ -117,18 +98,9 @@ const App = () => {
         await blogService.deletePost(blog.id);
         blogService.getAll().then((blogs) => setBlogs(blogs));
 
-        setMessage(`Removed blog: ${blog.title} by ${blog.author}`);
-        setMessageStatus("success");
-        setTimeout(() => {
-          setMessage(null);
-        }, 5000);
+        dispatch(setNotification({ message: `Removed blog: ${blog.title} by ${blog.author}`, status: "success" }, 5))
       } catch (e) {
-        console.log(e);
-        setMessage(`Error removing blog: ${e.response.data.error}`);
-        setMessageStatus("error");
-        setTimeout(() => {
-          setMessage(null);
-        }, 5000);
+        dispatch(setNotification({ message: `Error removing blog: ${e.response.data.error}`, status: "error" }, 5))
       }
     }
   };
@@ -136,7 +108,7 @@ const App = () => {
   if (user === null) {
     return (
       <>
-        <Notification message={message} className={messageStatus} />
+        <Notification />
         <LoginForm handleLogin={handleLogin} />
       </>
     );
@@ -144,7 +116,7 @@ const App = () => {
     return (
       <div>
         <h2>blogs</h2>
-        <Notification message={message} className={messageStatus} />
+        <Notification />
         <p>
           {user.name} logged in <button onClick={handleLogout}>logout</button>
         </p>
