@@ -1,41 +1,40 @@
-import { useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { deleteBlog, likeBlog } from "../reducers/blogReducer.js";
 
-const Blog = ({ blog, user, likeBlogPost, deleteBlogPost }) => {
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: "solid",
-    borderWidth: 1,
-    marginBottom: 5,
+const Blog = () => {
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+  const blogs = useSelector(state => state.blogs)
+  const user = useSelector(state => state.user)
+  const id = useParams().id
+  const blog = [...blogs].find(blog => blog.id === id)
+
+  const likeBlogPost = async (blog) => {
+    dispatch(likeBlog(blog))
   };
 
-  const [showDetails, setShowDetails] = useState(false);
+  const deleteBlogPost = async (blog) => {
+    const confirmation = confirm(`Remove blog ${blog.title} by ${blog.author}`);
+
+    if (confirmation) {
+      dispatch(deleteBlog(blog))
+      navigate('/')
+    }
+  };
+
+  if (!blog) {
+    return null
+  }
 
   return (
-    <div style={blogStyle} className="blog" data-testid={blog.title}>
-      <p>
-        <span className="blogTitle">{blog.title}</span>{" "}
-        <span className="blogAuthor">{blog.author}</span>
-        <button
-          className="blogDetailsButton"
-          onClick={() => setShowDetails(!showDetails)}
-        >
-          {showDetails ? "hide" : "show"}
-        </button>
-      </p>
-      {showDetails && <p className="blogURL">{blog.url}</p>}
-      {showDetails && (
-        <p className="blogLikes">
-          likes {blog.likes}{" "}
-          <button className="blogLikeButton" onClick={likeBlogPost}>
-            like
-          </button>
-        </p>
-      )}
-      {showDetails && <p className="blogUser">{blog.user.name}</p>}
-      {user.username === blog.user.username && (
-        <button onClick={deleteBlogPost}>delete</button>
-      )}
+    <div data-testid={blog.title}>
+      <h2>{blog.title}</h2>
+      <p>{blog.url}</p>
+      <p>{blog.likes} likes <button onClick={() => likeBlogPost(blog)}>like</button></p>
+      <p>added by {blog.user.name}</p>
+
+      {user.name === blog.user.name && <button onClick={() => deleteBlogPost(blog)}>delete</button>}
     </div>
   );
 };

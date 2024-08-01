@@ -1,6 +1,4 @@
 import { useParams } from "react-router-dom";
-import { useEffect } from "react";
-import usersService from "../services/users.js"
 import { useSelector } from "react-redux";
 
 const User = () => {
