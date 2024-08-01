@@ -1,5 +1,10 @@
 import { useState, forwardRef, useImperativeHandle } from "react";
 import PropTypes from "prop-types";
+import { styled } from "styled-components";
+
+const CancelButton = styled.button`
+    color: #ff1111;
+`
 
 const Toggleable = forwardRef((props, refs) => {
   const [visible, setVisible] = useState(false);
@@ -24,7 +29,7 @@ const Toggleable = forwardRef((props, refs) => {
       </div>
       <div style={showWhenVisible}>
         {props.children}
-        <button onClick={toggleVisibility}>cancel</button>
+        <CancelButton onClick={toggleVisibility}>cancel</CancelButton>
       </div>
     </div>
   );

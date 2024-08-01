@@ -24,7 +24,7 @@ const BlogList = () => {
     <div>
       <h2>blogs</h2>
 
-      <Toggleable buttonLabel="new blog post" ref={blogFormRef}>
+      <Toggleable buttonLabel="new blog post" ref={blogFormRef} >
         <NewBlogForm newBlog={newBlog} />
       </Toggleable>
 
@@ -40,7 +40,7 @@ const BlogList = () => {
         })
         .map((blog) => (
           <Link key={blog.id} to={`/${blog.id}`}>
-            <p>{blog.title} {blog.author}</p>
+            <p>{blog.title} by {blog.author}</p>
           </Link>
         ))}
     </div>

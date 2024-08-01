@@ -1,6 +1,15 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteBlog, likeBlog, commentBlog } from "../reducers/blogReducer.js";
+import { styled } from "styled-components";
+
+const BlogDiv = styled.div`
+    form {
+        input {
+            margin-right: 10px;
+        }
+    }
+`
 
 const Blog = () => {
   const dispatch = useDispatch()
@@ -34,7 +43,7 @@ const Blog = () => {
   }
 
   return (
-    <div data-testid={blog.title}>
+    <BlogDiv data-testid={blog.title}>
       <h2>{blog.title}</h2>
       <p>{blog.url}</p>
       <p>{blog.likes} likes <button onClick={() => likeBlogPost(blog)}>like</button></p>
@@ -52,7 +61,7 @@ const Blog = () => {
       </ul>
 
       {user.name === blog.user.name && <button onClick={() => deleteBlogPost(blog)}>delete</button>}
-    </div>
+    </BlogDiv>
   );
 };
 

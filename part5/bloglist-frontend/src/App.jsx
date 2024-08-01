@@ -17,6 +17,67 @@ import blogService from "./services/blogs";
 import User from "./components/User.jsx";
 import NavBar from "./components/NavBar.jsx";
 
+import { styled } from "styled-components";
+
+const Wrapper = styled.section`
+    display: flex;
+    flex-direction: column;
+      
+    font-size: 1.2rem;
+    padding: 20px;
+    font-family: Verdana, serif;
+    
+    button {
+        background: #ccc;
+        border-radius: 3px;
+        border: none;
+        padding: 5px 10px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background-color 0.1s ease;
+        font-size: 0.8rem;
+        width: max-content;
+
+        &:hover {
+            background: #aaa;
+        }
+    }
+
+    a {
+        color: inherit;
+        text-decoration: none;
+        transition: color 0.1s ease;
+    }
+
+    a:hover {
+        color: #aaa
+    }
+
+    input {
+        padding: 10px;
+        border-radius: 5px;
+        border: none;
+        background: #efefef;
+    }
+    
+    form {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        width: max-content;
+
+        div {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 30px;
+            justify-content: space-between;
+            width: 100%;
+        }
+    }
+  `
+
 const App = () => {
   const dispatch = useDispatch()
   const user = useSelector(state => state.user)
@@ -38,25 +99,25 @@ const App = () => {
 
   if (user === null) {
     return (
-      <div>
+      <Wrapper>
         <Notification />
         <LoginForm handleLogin={handleLogin} />
-      </div>
+      </Wrapper>
     );
   } else {
     return (
       <Router>
-        <Notification />
-        <NavBar />
+        <Wrapper>
+          <Notification />
+          <NavBar />
 
-        <h2>blog app</h2>
-
-        <Routes>
-          <Route path="/" element={<BlogList />} />
-          <Route path="/:id" element={<Blog />} />
-          <Route path="/users" element={<Users />} />
-          <Route path="/users/:id" element={<User />} />
-        </Routes>
+          <Routes>
+            <Route path="/" element={<BlogList />} />
+            <Route path="/:id" element={<Blog />} />
+            <Route path="/users" element={<Users />} />
+            <Route path="/users/:id" element={<User />} />
+          </Routes>
+        </Wrapper>
       </Router>
     );
   }
