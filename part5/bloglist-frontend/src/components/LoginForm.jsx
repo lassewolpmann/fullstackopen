@@ -1,52 +1,52 @@
-import { useState } from 'react'
-import PropTypes from 'prop-types'
+import { useState } from "react";
+import PropTypes from "prop-types";
 
 const LoginForm = ({ handleLogin }) => {
-    const [username, setUsername] = useState('')
-    const [password, setPassword] = useState('')
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
 
-    const login = async (event) => {
-        event.preventDefault()
-        handleLogin({
-            username: username,
-            password: password
-        })
+  const login = async (event) => {
+    event.preventDefault();
+    handleLogin({
+      username: username,
+      password: password,
+    });
 
-        setUsername('')
-        setPassword('')
-    }
+    setUsername("");
+    setPassword("");
+  };
 
-    return (
+  return (
+    <div>
+      <h2>Log in to application</h2>
+      <form onSubmit={login}>
         <div>
-            <h2>Log in to application</h2>
-            <form onSubmit={login}>
-                <div>
-                    username
-                    <input
-                        type="text"
-                        value={username}
-                        name="Username"
-                        data-testid="username"
-                        onChange={({ target }) => setUsername(target.value)}
-                    />
-                </div>
-                <div>
-                    password
-                    <input
-                        type="password"
-                        value={password}
-                        name="Password"
-                        data-testid="password"
-                        onChange={({ target }) => setPassword(target.value)}
-                    />
-                </div>
-                <button type="submit">login</button>
-            </form>
+          username
+          <input
+            type="text"
+            value={username}
+            name="Username"
+            data-testid="username"
+            onChange={({ target }) => setUsername(target.value)}
+          />
         </div>
-    )
-}
+        <div>
+          password
+          <input
+            type="password"
+            value={password}
+            name="Password"
+            data-testid="password"
+            onChange={({ target }) => setPassword(target.value)}
+          />
+        </div>
+        <button type="submit">login</button>
+      </form>
+    </div>
+  );
+};
 
 LoginForm.propTypes = {
-    handleLogin: PropTypes.func.isRequired
-}
-export default LoginForm
+  handleLogin: PropTypes.func.isRequired,
+};
+export default LoginForm;
