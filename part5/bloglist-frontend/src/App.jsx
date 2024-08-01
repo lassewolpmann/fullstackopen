@@ -13,6 +13,7 @@ import BlogList from "./components/BlogList.jsx";
 import Users from "./components/Users.jsx";
 
 import blogService from "./services/blogs";
+import User from "./components/User.jsx";
 
 const App = () => {
   const dispatch = useDispatch()
@@ -68,6 +69,7 @@ const App = () => {
         <Routes>
           <Route path="/" element={<BlogList />} />
           <Route path="/users" element={<Users />} />
+          <Route path="/users/:id" element={<User />} />
         </Routes>
       </Router>
     );
