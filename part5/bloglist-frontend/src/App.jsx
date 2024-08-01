@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setNotification } from "./reducers/notificationReducer.js";
 import { initializeBlogs, createBlog, likeBlog, deleteBlog } from "./reducers/blogReducer.js";
+import { loginUser, logoutUser } from "./reducers/userReducer.js";
 
 import Blog from "./components/Blog";
 import Notification from "./components/Notification";
@@ -10,29 +11,22 @@ import NewBlogForm from "./components/NewBlogForm";
 import Toggleable from "./components/Toggleable";
 
 import blogService from "./services/blogs";
-import loginService from "./services/login";
 
 const App = () => {
-  const [user, setUser] = useState(null);
-
   const blogFormRef = useRef();
   const dispatch = useDispatch()
-
+  const blogs = useSelector((state) => state.blogs)
+  const user = useSelector(state => state.user)
 
   useEffect(() => {
     dispatch(initializeBlogs())
   }, [dispatch]);
 
-  const blogs = useSelector((state) => state.blogs)
-
   useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem("loggedBlogAppUser");
-    if (loggedUserJSON) {
-      const user = JSON.parse(loggedUserJSON);
-      setUser(user);
+    if (user) {
       blogService.setToken(user.token);
     }
-  }, []);
+  }, [user]);
 
   const handleLogin = async (userObject) => {
     const username = userObject.username;
@@ -40,58 +34,28 @@ const App = () => {
 
     console.log("logging in with", username, password);
 
-    try {
-      const user = await loginService.login({
-        username,
-        password,
-      });
-
-      window.localStorage.setItem("loggedBlogAppUser", JSON.stringify(user));
-
-      setUser(user);
-      blogService.setToken(user.token);
-
-      dispatch(setNotification({ message: `Logged in as ${user.username}`, status: "success" }, 5))
-    } catch (exception) {
-      dispatch(setNotification({ message: "Wrong credentials", status: "error" }, 5))
-    }
+    dispatch(loginUser(userObject))
   };
 
   const handleLogout = (event) => {
-    event.preventDefault();
-    window.localStorage.removeItem("loggedBlogAppUser");
-    setUser(null);
-    blogService.setToken(null);
-    dispatch(setNotification({ message: "Logged out", status: "success" }, 5))
+    event.preventDefault()
+    dispatch(logoutUser())
   };
 
   const newBlog = async (blogObject) => {
     blogFormRef.current.toggleVisibility();
-
-    try {
-      dispatch(createBlog(blogObject))
-    } catch (e) {
-      dispatch(setNotification({ message: `Error adding new blog: ${e.response.data.error}`, status: "error" }, 5))
-    }
+    dispatch(createBlog(blogObject))
   };
 
   const likeBlogPost = async (blog) => {
-    try {
-      dispatch(likeBlog(blog))
-    } catch (e) {
-      console.log(e);
-    }
+    dispatch(likeBlog(blog))
   };
 
   const deleteBlogPost = async (blog) => {
     const confirmation = confirm(`Remove blog ${blog.title} by ${blog.author}`);
 
     if (confirmation) {
-      try {
-        dispatch(deleteBlog(blog))
-      } catch (e) {
-        dispatch(setNotification({ message: `Error removing blog: ${e.response.data.error}`, status: "error" }, 5))
-      }
+      dispatch(deleteBlog(blog))
     }
   };
 

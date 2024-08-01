@@ -29,24 +29,36 @@ export const initializeBlogs = () => {
 
 export const createBlog = (blogObject) => {
   return async dispatch => {
-    const newBlog = await blogService.create(blogObject);
-    dispatch(appendBlog(newBlog));
-    dispatch(setNotification({ message: `Added new blog: ${newBlog.title} by ${newBlog.author}`, status: "success" }, 5))
+    try {
+      const newBlog = await blogService.create(blogObject);
+      dispatch(appendBlog(newBlog));
+      dispatch(setNotification({ message: `Added new blog: ${newBlog.title} by ${newBlog.author}`, status: "success" }, 5))
+    } catch (e) {
+      dispatch(setNotification({ message: `Error adding new blog: ${e.response.data.error}`, status: "error" }, 5))
+    }
   }
 }
 
 export const likeBlog = (blogObject) => {
   return async dispatch => {
-    await blogService.likePost(blogObject.id, blogObject.likes + 1);
-    dispatch(initializeBlogs())
+    try {
+      await blogService.likePost(blogObject.id, blogObject.likes + 1);
+      dispatch(initializeBlogs())
+    } catch (e) {
+      console.log(e);
+    }
   }
 }
 
 export const deleteBlog = (blogObject) => {
   return async dispatch => {
-    await blogService.deletePost(blogObject.id);
-    dispatch(initializeBlogs())
-    dispatch(setNotification({ message: `Removed blog: ${blogObject.title} by ${blogObject.author}`, status: "success" }, 5))
+    try {
+      await blogService.deletePost(blogObject.id);
+      dispatch(initializeBlogs())
+      dispatch(setNotification({ message: `Removed blog: ${blogObject.title} by ${blogObject.author}`, status: "success" }, 5))
+    } catch (e) {
+      dispatch(setNotification({ message: `Error removing blog: ${e.response.data.error}`, status: "error" }, 5))
+    }
   }
 }
 
