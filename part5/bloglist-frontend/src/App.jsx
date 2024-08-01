@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setNotification } from "./reducers/notificationReducer.js";
-import { initializeBlogs, appendBlog } from "./reducers/blogReducer.js";
+import { initializeBlogs, createBlog } from "./reducers/blogReducer.js";
 
 import Blog from "./components/Blog";
 import Notification from "./components/Notification";
@@ -69,10 +69,7 @@ const App = () => {
     blogFormRef.current.toggleVisibility();
 
     try {
-      const newBlog = await blogService.create(blogObject);
-      console.log(newBlog)
-      dispatch(appendBlog(newBlog))
-      dispatch(setNotification({ message: `Added new blog: ${newBlog.title} by ${newBlog.author}`, status: "success" }, 5))
+      dispatch(createBlog(blogObject))
     } catch (e) {
       dispatch(setNotification({ message: `Error adding new blog: ${e.response.data.error}`, status: "error" }, 5))
     }
