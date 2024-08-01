@@ -35,4 +35,19 @@ export const createBlog = (blogObject) => {
   }
 }
 
+export const likeBlog = (blogObject) => {
+  return async dispatch => {
+    await blogService.likePost(blogObject.id, blogObject.likes + 1);
+    dispatch(initializeBlogs())
+  }
+}
+
+export const deleteBlog = (blogObject) => {
+  return async dispatch => {
+    await blogService.deletePost(blogObject.id);
+    dispatch(initializeBlogs())
+    dispatch(setNotification({ message: `Removed blog: ${blogObject.title} by ${blogObject.author}`, status: "success" }, 5))
+  }
+}
+
 export default blogSlice.reducer

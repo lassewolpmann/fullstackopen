@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setNotification } from "./reducers/notificationReducer.js";
-import { initializeBlogs, createBlog } from "./reducers/blogReducer.js";
+import { initializeBlogs, createBlog, likeBlog, deleteBlog } from "./reducers/blogReducer.js";
 
 import Blog from "./components/Blog";
 import Notification from "./components/Notification";
@@ -76,37 +76,23 @@ const App = () => {
   };
 
   const likeBlogPost = async (blog) => {
-    console.log("like")
-
-    /*
     try {
-      await blogService.likePost(blog.id, blog.likes + 1);
-      blogService.getAll().then((blogs) => setBlogs(blogs));
+      dispatch(likeBlog(blog))
     } catch (e) {
       console.log(e);
     }
-
-     */
   };
 
   const deleteBlogPost = async (blog) => {
-    console.log("delete")
-
-    /*
     const confirmation = confirm(`Remove blog ${blog.title} by ${blog.author}`);
 
     if (confirmation) {
       try {
-        await blogService.deletePost(blog.id);
-        blogService.getAll().then((blogs) => setBlogs(blogs));
-
-        dispatch(setNotification({ message: `Removed blog: ${blog.title} by ${blog.author}`, status: "success" }, 5))
+        dispatch(deleteBlog(blog))
       } catch (e) {
         dispatch(setNotification({ message: `Error removing blog: ${e.response.data.error}`, status: "error" }, 5))
       }
     }
-
-     */
   };
 
   if (user === null) {
