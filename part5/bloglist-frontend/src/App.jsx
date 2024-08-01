@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   BrowserRouter as Router,
-  Routes, Route, Link
+  Routes, Route
 } from 'react-router-dom'
 
 import { loginUser, logoutUser } from "./reducers/userReducer.js";
@@ -15,6 +15,7 @@ import Users from "./components/Users.jsx";
 
 import blogService from "./services/blogs";
 import User from "./components/User.jsx";
+import NavBar from "./components/NavBar.jsx";
 
 const App = () => {
   const dispatch = useDispatch()
@@ -35,15 +36,6 @@ const App = () => {
     dispatch(loginUser(userObject))
   };
 
-  const handleLogout = (event) => {
-    event.preventDefault()
-    dispatch(logoutUser())
-  };
-
-  const padding = {
-    padding: 5
-  }
-
   if (user === null) {
     return (
       <div>
@@ -54,18 +46,10 @@ const App = () => {
   } else {
     return (
       <Router>
-        <div>
-          <h2>blogs</h2>
-          <Notification />
-          <p>
-            {user.name} logged in <button onClick={handleLogout}>logout</button>
-          </p>
-        </div>
+        <Notification />
+        <NavBar />
 
-        <div>
-          <Link style={padding} to="/">blogs</Link>
-          <Link style={padding} to="/users">users</Link>
-        </div>
+        <h2>blog app</h2>
 
         <Routes>
           <Route path="/" element={<BlogList />} />

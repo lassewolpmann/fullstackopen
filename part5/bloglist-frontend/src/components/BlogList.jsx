@@ -21,7 +21,9 @@ const BlogList = () => {
   };
 
   return (
-    <>
+    <div>
+      <h2>blogs</h2>
+
       <Toggleable buttonLabel="new blog post" ref={blogFormRef}>
         <NewBlogForm newBlog={newBlog} />
       </Toggleable>
@@ -41,7 +43,7 @@ const BlogList = () => {
             <p>{blog.title} {blog.author}</p>
           </Link>
         ))}
-    </>
+    </div>
   )
 }
 
