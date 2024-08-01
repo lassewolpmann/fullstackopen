@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from "react-redux";
 import { setNotification } from "./reducers/notificationReducer.js";
+import { initializeBlogs, appendBlog } from "./reducers/blogReducer.js";
 
 import Blog from "./components/Blog";
 import Notification from "./components/Notification";
@@ -12,20 +13,17 @@ import blogService from "./services/blogs";
 import loginService from "./services/login";
 
 const App = () => {
-  const [blogs, setBlogs] = useState([]);
   const [user, setUser] = useState(null);
 
   const blogFormRef = useRef();
   const dispatch = useDispatch()
 
-  useEffect(() => {
-    const fetchBlogs = async () => {
-      const fetchedBlogs = await blogService.getAll();
-      setBlogs(fetchedBlogs);
-    };
 
-    fetchBlogs().catch(console.error);
-  }, []);
+  useEffect(() => {
+    dispatch(initializeBlogs())
+  }, [dispatch]);
+
+  const blogs = useSelector((state) => state.blogs)
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem("loggedBlogAppUser");
@@ -37,7 +35,6 @@ const App = () => {
   }, []);
 
   const handleLogin = async (userObject) => {
-    console.log(userObject);
     const username = userObject.username;
     const password = userObject.password;
 
@@ -73,8 +70,8 @@ const App = () => {
 
     try {
       const newBlog = await blogService.create(blogObject);
-      blogService.getAll().then((blogs) => setBlogs(blogs));
-
+      console.log(newBlog)
+      dispatch(appendBlog(newBlog))
       dispatch(setNotification({ message: `Added new blog: ${newBlog.title} by ${newBlog.author}`, status: "success" }, 5))
     } catch (e) {
       dispatch(setNotification({ message: `Error adding new blog: ${e.response.data.error}`, status: "error" }, 5))
@@ -82,15 +79,23 @@ const App = () => {
   };
 
   const likeBlogPost = async (blog) => {
+    console.log("like")
+
+    /*
     try {
       await blogService.likePost(blog.id, blog.likes + 1);
       blogService.getAll().then((blogs) => setBlogs(blogs));
     } catch (e) {
       console.log(e);
     }
+
+     */
   };
 
   const deleteBlogPost = async (blog) => {
+    console.log("delete")
+
+    /*
     const confirmation = confirm(`Remove blog ${blog.title} by ${blog.author}`);
 
     if (confirmation) {
@@ -103,6 +108,8 @@ const App = () => {
         dispatch(setNotification({ message: `Error removing blog: ${e.response.data.error}`, status: "error" }, 5))
       }
     }
+
+     */
   };
 
   if (user === null) {
@@ -125,7 +132,7 @@ const App = () => {
           <NewBlogForm newBlog={newBlog} />
         </Toggleable>
 
-        {blogs
+        {[...blogs]
           .sort((a, b) => {
             if (a.likes > b.likes) {
               return -1;
