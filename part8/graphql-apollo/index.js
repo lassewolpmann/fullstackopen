@@ -65,37 +65,39 @@ const resolvers = {
       return 0
     }
   },
+  Book: {
+    author: async (root) => {
+      return Author.findById(root.author)
+    }
+  },
   Query: {
     bookCount: () => Book.collection.countDocuments(),
     authorCount: () => Author.collection.countDocuments(),
     allBooks: async (root, args) => {
-      /*
-      const author = args.author
+      const author = await Author.findOne({ name: args.author })
       const genre = args.genre
 
-      let filteredBooks = books
-
-      if (author) {
-        filteredBooks = filteredBooks.filter(book => book.author === author)
+      if (args.author && !author) {
+        // Author parameter was given, but no Author was found
+        return []
       }
 
-      if (genre) {
-        filteredBooks = filteredBooks.filter(book => book.genres.includes(genre))
-      }
-
-       */
-
-      return Book.find({})
+      return Book.find({
+        author: author ? author._id : { $exists: true },
+        genres: genre ? genre : { $exists: true }
+      })
     },
     allAuthors: async () => Author.find({})
   },
 
   Mutation: {
     addBook: async (root, args) => {
-      const author = await Author.findOne({ name: args.name })
+      const author = await Author.findOne({ name: args.author })
       let id = ''
 
       if (!author) {
+        // Create new Author
+
         const newAuthor = new Author({
           name: args.author
         })
@@ -114,33 +116,16 @@ const resolvers = {
       })
 
       return book.save()
-
-      /*
-      if (!authors.includes(book.author)) {
-        const author = {
-          name: book.author,
-          bookCount: 1,
-          id: uuid()
-        }
-
-        authors = authors.concat(author)
-      }
-
-      return book
-
-       */
     },
-    editAuthor: (root, args) => {
-      return null
+    editAuthor: async (root, args) => {
+      const name = args.name
+      const year = args.setBornTo
 
-      /*
-      const updatedAuthor = { ...author, born: args.setBornTo }
-      authors = authors.map((author) => {
-        return author.name === args.name ? updatedAuthor : author
+      const query = { name: name }
+
+      return Author.findOneAndUpdate(query, {
+        born: year
       })
-
-      return updatedAuthor
-      */
     }
   }
 }
