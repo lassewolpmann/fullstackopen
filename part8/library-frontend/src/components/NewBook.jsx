@@ -17,7 +17,7 @@ const NewBook = () => {
   const submit = async (event) => {
     event.preventDefault()
 
-    createBook({
+    await createBook({
       variables: {
         title: title,
         author: author,
