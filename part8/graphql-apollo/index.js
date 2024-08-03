@@ -8,7 +8,6 @@ const Book = require('./models/book')
 const User = require('./models/user')
 const { GraphQLError } = require("graphql/error")
 const jwt = require('jsonwebtoken')
-const { bookCount } = require("./resolvers/author");
 
 require('dotenv').config()
 
@@ -55,7 +54,8 @@ const typeDefs = `
     authorCount: Int!
     allBooks (author: String, genre: String): [Book!]!
     allAuthors: [Author!]!
-    me: User
+    me: User,
+    genres: [String!]!
   }
   
   type Mutation {
@@ -82,7 +82,12 @@ const typeDefs = `
 
 const resolvers = {
   Author: {
-    bookCount: bookCount
+    bookCount: async (root) => {
+      const id = root.id
+      const books = await Book.find({ author: id })
+
+      return books.length
+    }
   },
   Book: {
     author: async (root) => {
@@ -109,6 +114,11 @@ const resolvers = {
     allAuthors: async () => Author.find({}),
     me: (root, args, context) => {
       return context.currentUser
+    },
+    genres: async () => {
+      const books = await Book.find({})
+      const genres = books.flatMap(book => book.genres)
+      return [...new Set(genres)]
     }
   },
 

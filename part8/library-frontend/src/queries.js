@@ -18,8 +18,8 @@ mutation createBook($title: String!, $author: String!, $published: Int!, $genres
 `
 
 export const ALL_BOOKS = gql`
-query {
-  allBooks {
+query AllBooks($genre: String, $author: String) {
+  allBooks(genre: $genre, author: $author) {
     title
     author {
       name
@@ -67,5 +67,11 @@ query Me {
     favoriteGenre
     id
   }
+}
+`
+
+export const ALL_GENRES = gql`
+query Query {
+  genres
 }
 `
