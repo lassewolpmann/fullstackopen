@@ -19,6 +19,7 @@ const NavBar = ({ token, setToken }) => {
       {token ? (
         <>
           <Link style={padding} to="/add-book">add book</Link>
+          <Link style={padding} to="/recommended">recommended</Link>
           <button onClick={logout}>logout</button>
         </>
       ) : (
