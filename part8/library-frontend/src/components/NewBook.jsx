@@ -3,7 +3,7 @@ import { useMutation } from '@apollo/client'
 import { CREATE_BOOK, ALL_BOOKS, ALL_AUTHORS } from "../queries.js";
 
 
-const NewBook = () => {
+const NewBook = ({ token }) => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [published, setPublished] = useState('')
@@ -11,6 +11,11 @@ const NewBook = () => {
   const [genres, setGenres] = useState([])
 
   const [ createBook ] = useMutation(CREATE_BOOK, {
+    context: {
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    },
     refetchQueries: [ { query: ALL_BOOKS }, { query: ALL_AUTHORS }]
   })
 

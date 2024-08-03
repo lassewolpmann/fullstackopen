@@ -2,7 +2,7 @@ import { useQuery, useMutation } from '@apollo/client'
 import { ALL_AUTHORS, EDIT_AUTHOR } from "../queries.js";
 import { useEffect, useState } from "react";
 
-const Authors = () => {
+const Authors = ({ token }) => {
   const result = useQuery(ALL_AUTHORS)
   const [name, setName] = useState('')
   const [year, setYear] = useState('')
@@ -14,6 +14,11 @@ const Authors = () => {
   }, [result])
 
   const [ editAuthor ] = useMutation(EDIT_AUTHOR, {
+    context: {
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    },
     refetchQueries: [{ query: ALL_AUTHORS }]
   })
 
@@ -55,19 +60,21 @@ const Authors = () => {
         </tbody>
       </table>
 
-      <form onSubmit={submit}>
-        <h3>Set birthyear</h3>
-        <select
-          value={name}
-          onChange={e => setName(e.target.value)}
-        >
-          {result.data.allAuthors.map((author) => (
-            <option value={author.name} key={author.name}>{author.name}</option>
-          ))}
-        </select>
-        <p>year: <input type="text" value={year} onChange={({ target }) => setYear(target.value)} /></p>
-        <button type="submit">update author</button>
-      </form>
+      {token ? (
+        <form onSubmit={submit}>
+          <h3>Set birthyear</h3>
+          <select
+            value={name}
+            onChange={e => setName(e.target.value)}
+          >
+            {result.data.allAuthors.map((author) => (
+              <option value={author.name} key={author.name}>{author.name}</option>
+            ))}
+          </select>
+          <p>year: <input type="text" value={year} onChange={({ target }) => setYear(target.value)} /></p>
+          <button type="submit">update author</button>
+        </form>
+      ): null}
     </div>
   )
 }

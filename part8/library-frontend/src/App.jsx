@@ -1,29 +1,27 @@
 import {
   BrowserRouter as Router,
-  Routes, Route, Link
+  Routes, Route
 } from 'react-router-dom'
+import { useState } from "react";
 
 import Authors from "./components/Authors";
 import Books from "./components/Books";
 import NewBook from "./components/NewBook";
+import LoginForm from "./components/LoginForm";
+import NavBar from "./components/NavBar.jsx";
 
 const App = () => {
-  const padding = {
-    padding: 5
-  }
+  const [token, setToken] = useState(null)
 
   return (
     <Router>
-      <div>
-        <Link style={padding} to="/">authors</Link>
-        <Link style={padding} to="/books">books</Link>
-        <Link style={padding} to="/add-book">add book</Link>
-      </div>
+      <NavBar token={token} setToken={setToken} />
 
       <Routes>
-        <Route path="/" element={<Authors /> } />
+        <Route path="/" element={<Authors token={token} /> } />
         <Route path="/books" element={<Books /> } />
-        <Route path="/add-book" element={<NewBook /> } />
+        <Route path="/add-book" element={<NewBook token={token} /> } />
+        <Route path="login" element={<LoginForm setToken={setToken} /> } />
       </Routes>
     </Router>
   );
