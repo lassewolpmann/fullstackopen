@@ -8,6 +8,7 @@ const Book = require('./models/book')
 const User = require('./models/user')
 const { GraphQLError } = require("graphql/error")
 const jwt = require('jsonwebtoken')
+const { bookCount } = require("./resolvers/author");
 
 require('dotenv').config()
 
@@ -81,12 +82,7 @@ const typeDefs = `
 
 const resolvers = {
   Author: {
-    bookCount: async (root) => {
-      const id = root.id
-      const books = await Book.find({ author: id })
-
-      return books.length
-    }
+    bookCount: bookCount
   },
   Book: {
     author: async (root) => {
