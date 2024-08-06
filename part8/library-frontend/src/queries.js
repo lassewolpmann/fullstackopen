@@ -44,7 +44,6 @@ mutation EditAuthor($name: String!, $setBornTo: Int!) {
     born
   }
 }
-}
 `
 
 export const LOGIN = gql`
