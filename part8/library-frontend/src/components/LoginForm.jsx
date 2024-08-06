@@ -21,6 +21,7 @@ const LoginForm = ({ setToken }) => {
     })
 
     setToken(res.data.login.value)
+    localStorage.setItem('token', res.data.login.value)
     setUsername('')
     setPassword('')
     navigate('/')

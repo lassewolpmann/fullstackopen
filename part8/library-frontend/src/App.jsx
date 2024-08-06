@@ -3,7 +3,8 @@ import {
   Routes, Route
 } from 'react-router-dom'
 import { useState } from "react";
-
+import { useQuery, useMutation, useSubscription } from '@apollo/client'
+import { BOOK_ADDED } from "./queries.js";
 import Authors from "./components/Authors";
 import Books from "./components/Books";
 import NewBook from "./components/NewBook";
@@ -13,6 +14,13 @@ import Recommended from "./components/Recommended.jsx";
 
 const App = () => {
   const [token, setToken] = useState(null)
+
+  useSubscription(BOOK_ADDED, {
+    onData: ({ data }) => {
+      const { bookAdded } = data.data
+      window.alert(`Book ${bookAdded.title} added`)
+    }
+  })
 
   return (
     <Router>

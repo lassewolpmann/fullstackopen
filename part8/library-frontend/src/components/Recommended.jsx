@@ -1,7 +1,10 @@
 import { useQuery } from '@apollo/client'
 import { ALL_BOOKS, GET_ME } from "../queries.js";
+import { useEffect, useState } from "react";
 
 const Recommended = ({ token }) => {
+  const [ favouriteGenre, setFavouriteGenre ] = useState('')
+
   const userResult = useQuery(GET_ME, {
     context: {
       headers: {
@@ -12,9 +15,16 @@ const Recommended = ({ token }) => {
 
   const booksResult = useQuery(ALL_BOOKS, {
     variables: {
-      genre: userResult.loading ? null : userResult.data.me.favoriteGenre
+      genre: userResult.loading ? null : favouriteGenre
     }
   })
+
+  useEffect(() => {
+    if (!userResult.loading) {
+      const { me } = userResult.data
+      setFavouriteGenre(me.favoriteGenre)
+    }
+  }, [userResult])
 
   if (userResult.loading || booksResult.loading) {
     return <div>loading...</div>
@@ -22,7 +32,7 @@ const Recommended = ({ token }) => {
 
   return (
     <div>
-      <h2>books in your favourite genre <i>{userResult.data.me.favoriteGenre}</i></h2>
+      <h2>books in your favourite genre <i>{favouriteGenre}</i></h2>
       <table>
         <tbody>
         <tr>
