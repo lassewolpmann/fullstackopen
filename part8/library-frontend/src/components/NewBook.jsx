@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useMutation } from '@apollo/client'
-import { CREATE_BOOK, ALL_BOOKS, ALL_AUTHORS } from "../queries.js";
+import { CREATE_BOOK, ALL_BOOKS } from "../queries.js";
 
 
 const NewBook = ({ token }) => {
@@ -16,7 +16,21 @@ const NewBook = ({ token }) => {
         "Authorization": `Bearer ${token}`
       }
     },
-    refetchQueries: [ { query: ALL_BOOKS }, { query: ALL_AUTHORS }]
+    update: (cache, response) => {
+      const { addBook } = response.data
+      cache.updateQuery({
+        query: ALL_BOOKS,
+        variables: {
+          // This HAS to be set as the same initial state value as in Books.jsx, since the cached query also uses an empty string for genre
+          genre: ''
+        }
+      }, (data) => {
+        if (!data) return { undefined }
+        return {
+          allBooks: data.allBooks.concat(addBook)
+        }
+      })
+    }
   })
 
   const submit = async (event) => {
