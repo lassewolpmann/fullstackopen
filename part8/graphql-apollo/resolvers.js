@@ -9,12 +9,7 @@ const jwt = require("jsonwebtoken");
 
 const resolvers = {
   Author: {
-    bookCount: async (root) => {
-      const id = root.id
-      const books = await Book.find({ author: id })
-
-      return books.length
-    }
+    bookCount: (root) =>  root.books.length
   },
   Book: {
     author: async (root) => {
@@ -38,7 +33,7 @@ const resolvers = {
         genres: genre ? genre : { $exists: true }
       })
     },
-    allAuthors: async () => Author.find({}),
+    allAuthors: async () => Author.find({}).populate('books'),
     me: (root, args, context) => {
       return context.currentUser
     },
@@ -57,7 +52,7 @@ const resolvers = {
         })
       }
 
-      const author = await Author.findOne({ name: args.author })
+      let author = await Author.findOne({ name: args.author })
       let id = ''
 
       if (!author) {
@@ -68,7 +63,7 @@ const resolvers = {
         })
 
         try {
-          const res = await newAuthor.save()
+          author = await newAuthor.save()
           id = res._id
         } catch (error) {
           throw new GraphQLError('Creating new Author failed', {
@@ -92,6 +87,8 @@ const resolvers = {
 
       try {
         await book.save()
+        author.books.push(book)
+        await author.save()
       } catch (error) {
         throw new GraphQLError('Adding Book failed', {
           extensions: {
