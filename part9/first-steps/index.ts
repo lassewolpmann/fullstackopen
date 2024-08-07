@@ -7,21 +7,21 @@ app.get('/hello', (_req, res) => {
 });
 
 app.get('/bmi', (req, res) => {
-  const { height, weight } = req.query
+  const { height, weight } = req.query;
 
   if (!height || !weight) {
-    res.status(400).json({ error: "height or weight parameter is missing" })
+    res.status(400).json({ error: "height or weight parameter is missing" });
   } else if (isNaN(Number(height)) || isNaN(Number(weight))) {
-    res.status(400).json({ error: "height or weight parameter is not a number "})
+    res.status(400).json({ error: "height or weight parameter is not a number "});
   } else {
-    const bmi = calculateBmi(Number(height), Number(weight))
+    const bmi = calculateBmi(Number(height), Number(weight));
     res.status(200).json({
       height: height,
       weight: weight,
       bmi: bmi
-    })
+    });
   }
-})
+});
 
 const PORT = 3003;
 

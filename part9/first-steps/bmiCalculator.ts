@@ -1,18 +1,18 @@
 export const calculateBmi = (height: number, weight: number): string => {
-  const bmi = weight / Math.pow(height / 100, 2)
+  const bmi = weight / Math.pow(height / 100, 2);
 
-  let range = ""
+  let range = "";
   if (bmi < 18.5) {
-    range = "Underweight"
+    range = "Underweight";
   } else if (bmi >= 18.5 && bmi < 25) {
-    range = "Normal"
+    range = "Normal";
   } else if (bmi >= 25 && bmi < 30) {
-    range = "Overweight"
+    range = "Overweight";
   } else if (bmi >= 30) {
-    range = "Obese"
+    range = "Obese";
   } else {
-    range = "Invalid"
+    range = "Invalid";
   }
 
-  return `${range} range`
-}
+  return `${range} range`;
+};
