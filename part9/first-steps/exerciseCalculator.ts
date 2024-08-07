@@ -1,9 +1,4 @@
-interface ExerciseValues {
-  hours: number[]
-  target: number
-}
-
-interface Result {
+export interface Result {
   periodLength: number,
   trainingDays: number,
   success: boolean,
@@ -13,25 +8,12 @@ interface Result {
   average: number
 }
 
-const parseExerciseArguments = (args: string[]): ExerciseValues => {
-  if (args.length < 4) throw new Error('Not enough arguments');
-  const values = args.slice(2);
-  const areValuesNan: boolean[] = values.map((value) => isNaN(Number(value)));
+export interface ExerciseValues {
+  daily_exercises: number[]
+  target: number
+}
 
-  if (areValuesNan.includes(true)) {
-    throw new Error('At least one provided value is not a number!');
-  }
-
-  const hours = values.map((value) => Number(value));
-  const target = hours.pop();
-
-  return {
-    hours: hours,
-    target: target
-  };
-};
-
-const calculateExercises = (hours: number[], target: number): Result => {
+export const calculateExercises = (hours: number[], target: number): Result => {
   const period = hours.length;
   const trainingDays = hours.filter((hour: number): boolean => hour !== 0).length;
   const average = hours.reduce((acc, cur) => acc + cur) / period;
@@ -63,14 +45,3 @@ const calculateExercises = (hours: number[], target: number): Result => {
     average: average
   };
 };
-
-try {
-  const { hours, target } = parseExerciseArguments(process.argv);
-  console.log(calculateExercises(hours, target));
-} catch (error: unknown) {
-  let errorMessage = 'Something bad happened.';
-  if (error instanceof Error) {
-    errorMessage += ' Error: ' + error.message;
-  }
-  console.log(errorMessage);
-}
