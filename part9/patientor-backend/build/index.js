@@ -4,12 +4,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const cors = require("cors");
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
-const PORT = 3000;
+app.use(cors());
+const PORT = 3001;
 app.get('/api/ping', (_req, res) => {
     console.log('someone pinged here');
     res.send('pong');
+});
+app.get('/api/diagnoses', () => {
 });
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
