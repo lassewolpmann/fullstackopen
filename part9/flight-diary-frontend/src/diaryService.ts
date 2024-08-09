@@ -3,14 +3,16 @@ import { DiaryEntry, NewDiaryEntry } from "./types.ts";
 
 const baseUrl = 'http://localhost:3000/api/diaries'
 
-export const getAllEntries = () => {
-  return axios
-    .get<DiaryEntry[]>(baseUrl)
-    .then(res => res.data)
+export const getAllEntries = async () => {
+  const res = await axios
+    .get<DiaryEntry[]>(baseUrl);
+
+  return res.data;
 }
 
-export const createEntry = (object: NewDiaryEntry) => {
-  return axios
-    .post<DiaryEntry>(baseUrl, object)
-    .then(res => res.data)
+export const createEntry = async (object: NewDiaryEntry) => {
+  const res = await axios
+    .post<DiaryEntry>(baseUrl, object);
+
+  return res.data;
 }
