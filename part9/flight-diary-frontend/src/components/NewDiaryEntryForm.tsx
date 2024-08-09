@@ -2,6 +2,8 @@ import React, { SyntheticEvent, useState } from "react";
 import { DiaryEntry, Visibility, Weather } from "../types.ts";
 import { createEntry } from "../diaryService.ts";
 import axios from "axios";
+import VisibilityButton from "./VisibilityButton.tsx";
+import WeatherButton from "./WeatherButton.tsx";
 
 interface NewDiaryEntryFormProps {
   entries: DiaryEntry[],
@@ -16,8 +18,8 @@ const NewDiaryEntryForm = (props: NewDiaryEntryFormProps) => {
   const { entries, setEntries } = props;
 
   const [date, setDate] = useState<string>('')
-  const [visibility, setVisibility] = useState<Visibility>(Visibility.Ok);
-  const [weather, setWeather] = useState<Weather>(Weather.Rainy);
+  const [visibility, setVisibility] = useState<Visibility>(Visibility.Great);
+  const [weather, setWeather] = useState<Weather>(Weather.Sunny);
   const [comment, setComment] = useState<string>('');
 
   const [error, setError] = useState<string | null>(null)
@@ -47,6 +49,11 @@ const NewDiaryEntryForm = (props: NewDiaryEntryFormProps) => {
           console.error(error);
         }
       })
+
+    setDate('')
+    setVisibility(Visibility.Great)
+    setWeather(Weather.Sunny)
+    setComment('')
   }
 
   return (
@@ -54,17 +61,32 @@ const NewDiaryEntryForm = (props: NewDiaryEntryFormProps) => {
       <h1>Add new entry</h1>
       <p style={errorStyle}>{error}</p>
       <form onSubmit={entryCreation}>
-        <label htmlFor={"date"}>date</label>
-        <input type="text" name="date" onChange={(event) => setDate(event.target.value)} value={date} /><br />
+        <div style={{ padding: 5 }}>
+          <label htmlFor={"date"}><b>date</b></label><br />
+          <input type="date" name="date" required={true} onChange={(event) => setDate(event.target.value)}
+                 value={date} />
+        </div>
 
-        <label htmlFor={"visibility"}>visibility</label>
-        <input type="text" name="visibility" onChange={(event) => setVisibility(event.target.value as Visibility)} value={visibility} /><br />
+        <div style={{ padding: 5 }}>
+          <b>visibility</b>
 
-        <label htmlFor={"weather"}>weather</label>
-        <input type="text" name="weather" onChange={(event) => setWeather(event.target.value as Weather)} value={weather} /><br />
+          {Object.values(Visibility).map(value => (
+            <VisibilityButton visibility={visibility} setVisibility={setVisibility} value={value} key={value} />
+          ))}
+        </div>
 
-        <label htmlFor={"comment"}>comment</label>
-        <input type="text" name="comment" onChange={(event) => setComment(event.target.value)} value={comment} /><br />
+        <div style={{ padding: 5 }}>
+          <b>weather</b>
+          {Object.values(Weather).map(value => (
+            <WeatherButton weather={weather} setWeather={setWeather} value={value} key={value} />
+          ))}
+        </div>
+
+        <div style={{ padding: 5 }}>
+          <label htmlFor={"comment"}><b>comment</b></label><br />
+          <input type="text" name="comment" onChange={(event) => setComment(event.target.value)}
+                 value={comment} />
+        </div>
 
         <button type="submit">add</button>
       </form>
