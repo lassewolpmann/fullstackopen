@@ -1,6 +1,6 @@
-import { Diagnosis } from "../../../../types.ts";
+import { Diagnosis } from "../../../../../types.ts";
 import { useEffect, useState } from "react";
-import diagnosisService from "../../../../services/diagnoses.ts";
+import diagnosisService from "../../../../../services/diagnoses.ts";
 
 const DiagnosisListing = ({ code }: { code: string }) => {
   const [diagnosis, setDiagnosis] = useState<Diagnosis>();

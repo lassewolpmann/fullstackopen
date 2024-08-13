@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { Patient, Diagnosis } from "../../../types.ts";
 import patientService from "../../../services/patients.ts";
 import diagnosesService from "../../../services/diagnoses.ts";
-import DiagnosisListing from "./DiagnosisListing";
+import EntryListing from "./EntryListing";
 
 const PatientPage = () => {
   const [patient, setPatient] = useState<Patient>();
@@ -29,6 +29,13 @@ const PatientPage = () => {
     );
   }
 
+  const style = {
+    border: '1px solid black',
+    borderRadius: '10px',
+    padding: '10px 20px',
+    margin: '10px 0'
+  };
+
   return (
     <div>
       <h1>{patient.name}
@@ -40,14 +47,7 @@ const PatientPage = () => {
       <p>occupation: {patient.occupation}</p>
       <h2>entries</h2>
       {patient.entries.map(entry => (
-        <div key={entry.id}>
-          <p>{entry.date} <i>{entry.description}</i></p>
-          <ul>
-            {entry.diagnosisCodes?.map(code => (
-              <li key={code}><DiagnosisListing code={code} /></li>
-            ))}
-          </ul>
-        </div>
+        <div style={style} key={entry.id}><EntryListing entry={entry} /></div>
       ))}
     </div>
   );
