@@ -37,14 +37,13 @@ router.post('/', (req, res) => {
 router.post('/:id/entries', (req, res) => {
   try {
     const newEntry = utils.toNewEntry(req.body);
-    console.log(newEntry);
 
     const { id } = req.params;
     const patient = patientService.getEntryById(id);
 
     if (patient) {
-      patientService.addEntryToPatient(patient, newEntry);
-      res.end();
+      const addedEntry = patientService.addEntryToPatient(patient, newEntry);
+      res.status(201).json(addedEntry);
     } else {
       res.status(404).send(`Patient with ID ${id} not found.`);
     }

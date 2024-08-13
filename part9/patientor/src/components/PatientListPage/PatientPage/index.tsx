@@ -7,6 +7,7 @@ import { Patient, Diagnosis } from "../../../types.ts";
 import patientService from "../../../services/patients.ts";
 import diagnosesService from "../../../services/diagnoses.ts";
 import EntryListing from "./EntryListing";
+import NewEntryForm from "./NewEntryForm";
 
 const PatientPage = () => {
   const [patient, setPatient] = useState<Patient>();
@@ -23,7 +24,7 @@ const PatientPage = () => {
     }
   }, [id]);
 
-  if (!patient || !diagnoses) {
+  if (!patient || !diagnoses || !id) {
     return (
       <h1>Patient not found.</h1>
     );
@@ -45,6 +46,7 @@ const PatientPage = () => {
       </h1>
       <p>ssn: {patient.ssn}</p>
       <p>occupation: {patient.occupation}</p>
+      <NewEntryForm id={id} patient={patient} setPatient={setPatient} />
       <h2>entries</h2>
       {patient.entries.map(entry => (
         <div style={style} key={entry.id}><EntryListing entry={entry} /></div>
