@@ -3,21 +3,27 @@ import MaleIcon from '@mui/icons-material/Male';
 import FemaleIcon from '@mui/icons-material/Female';
 import TransgenderIcon from '@mui/icons-material/Transgender';
 import { useEffect, useState } from "react";
-import { Patient } from "../../../types.ts";
-import { apiBaseUrl } from "../../../constants.ts";
-import axios from "axios";
+import { Patient, Diagnosis } from "../../../types.ts";
+import patientService from "../../../services/patients.ts";
+import diagnosesService from "../../../services/diagnoses.ts";
+import DiagnosisListing from "./DiagnosisListing";
 
 const PatientPage = () => {
   const [patient, setPatient] = useState<Patient>();
+  const [diagnoses, setDiagnoses] = useState<Diagnosis[]>([]);
   const id = useParams().id;
 
   useEffect(() => {
-    axios
-      .get(`${apiBaseUrl}/patients/${id}`)
-      .then(res => setPatient(res.data));
+    if (id) {
+      patientService.getById(id)
+        .then(res => setPatient(res));
+
+      diagnosesService.getAll()
+        .then(res => setDiagnoses(res));
+    }
   }, [id]);
 
-  if (!patient) {
+  if (!patient || !diagnoses) {
     return (
       <h1>Patient not found.</h1>
     );
@@ -38,7 +44,7 @@ const PatientPage = () => {
           <p>{entry.date} <i>{entry.description}</i></p>
           <ul>
             {entry.diagnosisCodes?.map(code => (
-              <li key={code}>{code}</li>
+              <li key={code}><DiagnosisListing code={code} /></li>
             ))}
           </ul>
         </div>
