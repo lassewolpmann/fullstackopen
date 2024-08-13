@@ -1,15 +1,18 @@
 import React, { BaseSyntheticEvent, useState } from "react";
 import patientService from "../../../../services/patients.ts";
 import { EntryWithoutId, Patient } from "../../../../types.ts";
+import { Button, TextField } from "@mui/material";
 
 interface Props {
   id: string,
   patient: Patient,
-  setPatient: React.Dispatch<React.SetStateAction<Patient | undefined>>
+  setPatient: React.Dispatch<React.SetStateAction<Patient | undefined>>,
+  setNotification: React.Dispatch<React.SetStateAction<string | null>>,
+  setNotificationStatus: React.Dispatch<React.SetStateAction<string | null>>
 }
 
 const NewEntryForm = (props: Props) => {
-  const { id, patient, setPatient } = props;
+  const { id, patient, setPatient, setNotification, setNotificationStatus } = props;
 
   const [formVisible, setFormVisible] = useState<boolean>(false);
   const [description, setDescription] = useState<string>('');
@@ -36,7 +39,8 @@ const NewEntryForm = (props: Props) => {
       description: description,
       specialist: specialist,
       type: "HealthCheck",
-      healthCheckRating: Number(rating)
+      healthCheckRating: Number(rating),
+      diagnosisCodes: codes.split(',')
     };
 
     patientService.createEntry(object, id)
@@ -46,6 +50,9 @@ const NewEntryForm = (props: Props) => {
           entries: patient.entries.concat(data)
         });
 
+        setNotification('Added Entry');
+        setNotificationStatus('success');
+
         toggleForm();
         setDescription('');
         setDate('');
@@ -53,44 +60,58 @@ const NewEntryForm = (props: Props) => {
         setRating('');
         setCodes('');
       })
-      .catch(error => console.log(error));
+      .catch(error => {
+        setNotification(error.response.data);
+        setNotificationStatus('error');
+      });
+
+    setTimeout(() => {
+      setNotification(null);
+      setNotificationStatus(null);
+    }, 5000);
   };
 
   if (!formVisible) {
     return (
-      <button onClick={toggleForm}>add new entry</button>
+      <Button onClick={toggleForm} variant="outlined">add new entry</Button>
     );
   } else {
     return (
       <form style={style} onReset={toggleForm} onSubmit={handleSubmit}>
         <h2>New HealthCheck entry</h2>
-        <p>
-          <label htmlFor={"description"}>Description: </label>
-          <input type="text" name="description" value={description}
-                 onChange={(event => setDescription(event.target.value))} />
-        </p>
-        <p>
-          <label htmlFor={"date"}>Date: </label>
-          <input type="text" name="date" value={date}
-                 onChange={(event => setDate(event.target.value))} />
-        </p>
-        <p>
-          <label htmlFor={"specialist"}>Specialist: </label>
-          <input type="text" name="specialist" value={specialist}
-                 onChange={(event => setSpecialist(event.target.value))} />
-        </p>
-        <p>
-          <label htmlFor={"rating"}>Rating: </label>
-          <input type="text" name="rating" value={rating}
-                 onChange={(event => setRating(event.target.value))} />
-        </p>
-        <p>
-          <label htmlFor={"codes"}>Diagnosis codes: </label>
-          <input type="text" name="codes" value={codes}
-                 onChange={(event => setCodes(event.target.value))} />
-        </p>
-        <button type="reset">cancel</button>
-        <button type="submit">add entry</button>
+        <TextField
+          label="Description"
+          fullWidth
+          value={description}
+          onChange={(event => setDescription(event.target.value))}
+        />
+        <TextField
+          label="Date"
+          fullWidth
+          value={date}
+          onChange={(event => setDate(event.target.value))}
+        />
+        <TextField
+          label="Specialist"
+          fullWidth
+          value={specialist}
+          onChange={(event => setSpecialist(event.target.value))}
+        />
+        <TextField
+          label="Rating"
+          fullWidth
+          value={rating}
+          onChange={(event => setRating(event.target.value))}
+        />
+        <TextField
+          label="Diagnosis codes"
+          fullWidth
+          value={codes}
+          onChange={(event => setCodes(event.target.value))}
+        />
+
+        <Button type="reset" variant="contained" color="error">cancel</Button>
+        <Button type="submit" variant="contained" color="success">add entry</Button>
       </form>
     );
   }

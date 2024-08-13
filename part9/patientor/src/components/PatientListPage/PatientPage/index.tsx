@@ -8,10 +8,13 @@ import patientService from "../../../services/patients.ts";
 import diagnosesService from "../../../services/diagnoses.ts";
 import EntryListing from "./EntryListing";
 import NewEntryForm from "./NewEntryForm";
+import Notification from "./Notification";
 
 const PatientPage = () => {
   const [patient, setPatient] = useState<Patient>();
   const [diagnoses, setDiagnoses] = useState<Diagnosis[]>([]);
+  const [notification, setNotification] = useState<string | null>(null);
+  const [notificationStatus, setNotificationStatus] = useState<string | null>(null);
   const id = useParams().id;
 
   useEffect(() => {
@@ -39,6 +42,7 @@ const PatientPage = () => {
 
   return (
     <div>
+      <Notification notification={notification} status={notificationStatus} />
       <h1>{patient.name}
         {patient.gender === 'male' && <MaleIcon />}
         {patient.gender === 'female' && <FemaleIcon />}
@@ -46,7 +50,7 @@ const PatientPage = () => {
       </h1>
       <p>ssn: {patient.ssn}</p>
       <p>occupation: {patient.occupation}</p>
-      <NewEntryForm id={id} patient={patient} setPatient={setPatient} />
+      <NewEntryForm id={id} patient={patient} setPatient={setPatient} setNotification={setNotification} setNotificationStatus={setNotificationStatus} />
       <h2>entries</h2>
       {patient.entries.map(entry => (
         <div style={style} key={entry.id}><EntryListing entry={entry} /></div>
