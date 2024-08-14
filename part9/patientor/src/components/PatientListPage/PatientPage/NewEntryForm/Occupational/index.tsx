@@ -24,13 +24,18 @@ const Occupational = (props: Props) => {
     <>
       <TextField
         label="Employer"
+        margin="dense"
         fullWidth
+        required
         value={employer}
         onChange={(event => setEmployer(event.target.value))}
       />
 
       <TextField
         label="Sick Leave Start Date"
+        margin="dense"
+        type="date"
+        InputLabelProps={{ shrink: true }}
         fullWidth
         value={sickLeaveStart}
         onChange={(event => setSickLeaveStart(event.target.value))}
@@ -38,6 +43,9 @@ const Occupational = (props: Props) => {
 
       <TextField
         label="Sick Leave End Date"
+        margin="dense"
+        type="date"
+        InputLabelProps={{ shrink: true }}
         fullWidth
         value={sickLeaveEnd}
         onChange={(event => setSickLeaveEnd(event.target.value))}

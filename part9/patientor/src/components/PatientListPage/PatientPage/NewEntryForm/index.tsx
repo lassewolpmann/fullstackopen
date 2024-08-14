@@ -1,7 +1,18 @@
-import React, { BaseSyntheticEvent, useState } from "react";
-import { EntryWithoutId, Patient } from "../../../../types.ts";
-import { Button, FormControl, Grid, InputLabel, MenuItem, Select, SelectChangeEvent, TextField } from "@mui/material";
+import React, { BaseSyntheticEvent, useEffect, useState } from "react";
+import { Diagnosis, EntryWithoutId, Patient } from "../../../../types.ts";
+import {
+  Button,
+  FormControl,
+  Grid,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  TextField
+} from "@mui/material";
+
 import HealthCheck from "./HealthCheck";
+import diagnosisService from "../../../../services/diagnoses.ts";
 import patientService from "../../../../services/patients.ts";
 import Hospital from "./Hospital";
 import Occupational from "./Occupational";
@@ -17,6 +28,7 @@ interface Props {
 const NewEntryForm = (props: Props) => {
   const { id, patient, setPatient, setNotification, setNotificationStatus } = props;
 
+  const [diagnoses, setDiagnoses] = useState<Diagnosis[]>([]);
   const [formVisible, setFormVisible] = useState<boolean>(false);
   const [entryType, setEntryType] = useState<string>('Hospital');
 
@@ -29,7 +41,7 @@ const NewEntryForm = (props: Props) => {
   const [description, setDescription] = useState<string>('');
   const [date, setDate] = useState<string>('');
   const [specialist, setSpecialist] = useState<string>('');
-  const [codes, setCodes] = useState<string>('');
+  const [codes, setCodes] = useState<string[]>([]);
 
   // Health Check
   const [rating, setRating] = useState<string>('');
@@ -43,18 +55,32 @@ const NewEntryForm = (props: Props) => {
   const [sickLeaveStart, setSickLeaveStart] = useState<string>('');
   const [sickLeaveEnd, setSickLeaveEnd] = useState<string>('');
 
+  useEffect(() => {
+    diagnosisService.getAll()
+      .then(res => setDiagnoses(res));
+  }, []);
+
   const resetValues = () => {
     setDescription('');
     setDate('');
     setSpecialist('');
-    setCodes('');
+    setCodes([]);
     setRating('');
     setDischargeDate('');
     setDischargeCondition('');
     setEmployer('');
     setSickLeaveStart('');
     setSickLeaveEnd('');
-  }
+  };
+
+  const handleCodeChange = (event: SelectChangeEvent<typeof codes>) => {
+    const {
+      target: { value },
+    } = event;
+
+    setCodes(typeof value === 'string' ? value.split(',') : value);
+    console.log(codes);
+  };
 
   const handleReset = (event: BaseSyntheticEvent) => {
     event.preventDefault();
@@ -73,7 +99,7 @@ const NewEntryForm = (props: Props) => {
           date: date,
           description: description,
           specialist: specialist,
-          diagnosisCodes: codes.split(','),
+          diagnosisCodes: codes,
           type: 'Hospital',
           discharge: {
             date: dischargeDate,
@@ -87,7 +113,7 @@ const NewEntryForm = (props: Props) => {
           date: date,
           description: description,
           specialist: specialist,
-          diagnosisCodes: codes.split(','),
+          diagnosisCodes: codes,
           type: 'OccupationalHealthcare',
           employerName: employer
         };
@@ -105,7 +131,7 @@ const NewEntryForm = (props: Props) => {
           date: date,
           description: description,
           specialist: specialist,
-          diagnosisCodes: codes.split(','),
+          diagnosisCodes: codes,
           type: 'HealthCheck',
           healthCheckRating: Number(rating)
         };
@@ -151,6 +177,7 @@ const NewEntryForm = (props: Props) => {
           <FormControl fullWidth>
             <InputLabel id="entry-type-label">Entry Type</InputLabel>
             <Select
+              margin="dense"
               labelId="entry-type-label"
               id="entry-type-select"
               value={entryType}
@@ -161,45 +188,70 @@ const NewEntryForm = (props: Props) => {
               <MenuItem value={"OccupationalHealthcare"}>Occupational Healthcare</MenuItem>
               <MenuItem value={"HealthCheck"}>Health Check</MenuItem>
             </Select>
-
-            <TextField
-              label="Description"
-              fullWidth
-              value={description}
-              onChange={(event => setDescription(event.target.value))}
-            />
-            <TextField
-              label="Date"
-              fullWidth
-              value={date}
-              onChange={(event => setDate(event.target.value))}
-            />
-            <TextField
-              label="Specialist"
-              fullWidth
-              value={specialist}
-              onChange={(event => setSpecialist(event.target.value))}
-            />
-            <TextField
-              label="Diagnosis codes"
-              fullWidth
-              value={codes}
-              onChange={(event => setCodes(event.target.value))}
-            />
-
-            {entryType === 'Hospital' && <Hospital dischargeDate={dischargeDate} setDischargeDate={setDischargeDate} dischargeCondition={dischargeCondition} setDischargeCondition={setDischargeCondition} />}
-            {entryType === 'OccupationalHealthcare' && <Occupational employer={employer} setEmployer={setEmployer} sickLeaveStart={sickLeaveStart} setSickLeaveStart={setSickLeaveStart} sickLeaveEnd={sickLeaveEnd} setSickLeaveEnd={setSickLeaveEnd} />}
-            {entryType === 'HealthCheck' && <HealthCheck rating={rating} setRating={setRating} />}
-
-            <Grid container spacing={2}>
-              <Grid item>
-                <Button type="submit" variant="contained" color="success">add entry</Button>
-              </Grid>
-              <Grid item>
-                <Button type="reset" variant="contained" color="error">cancel</Button>
-              </Grid>
-            </Grid>
           </FormControl>
+
+          <TextField
+            label="Description"
+            margin="dense"
+            fullWidth
+            value={description}
+            onChange={(event => setDescription(event.target.value))}
+            required
+          />
+
+          <TextField
+            type="date"
+            label="Date"
+            margin="dense"
+            fullWidth
+            value={date}
+            onChange={(event => setDate(event.target.value))}
+            InputLabelProps={{ shrink: true }}
+            required
+          />
+          <TextField
+            label="Specialist"
+            margin="dense"
+            fullWidth
+            value={specialist}
+            onChange={(event => setSpecialist(event.target.value))}
+            required
+          />
+
+          <FormControl fullWidth>
+            <InputLabel id="diagnosis-code-label">Diagnosis codes</InputLabel>
+            <Select
+              margin="dense"
+              labelId="diagnosis-code-label"
+              id="diagnosis-code-select"
+              label="Diagnosis codes"
+              multiple
+              value={codes}
+              onChange={handleCodeChange}
+            >
+              {diagnoses.map(d => (
+                <MenuItem
+                  key={d.code}
+                  value={d.code}
+                >
+                  {d.code} - {d.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          {entryType === 'Hospital' && <Hospital dischargeDate={dischargeDate} setDischargeDate={setDischargeDate} dischargeCondition={dischargeCondition} setDischargeCondition={setDischargeCondition} />}
+          {entryType === 'OccupationalHealthcare' && <Occupational employer={employer} setEmployer={setEmployer} sickLeaveStart={sickLeaveStart} setSickLeaveStart={setSickLeaveStart} sickLeaveEnd={sickLeaveEnd} setSickLeaveEnd={setSickLeaveEnd} />}
+          {entryType === 'HealthCheck' && <HealthCheck rating={rating} setRating={setRating} />}
+
+          <Grid container spacing={2}>
+            <Grid item>
+              <Button type="submit" variant="contained" color="success">add entry</Button>
+            </Grid>
+            <Grid item>
+              <Button type="reset" variant="contained" color="error">cancel</Button>
+            </Grid>
+          </Grid>
         </form>
       </div>
     );

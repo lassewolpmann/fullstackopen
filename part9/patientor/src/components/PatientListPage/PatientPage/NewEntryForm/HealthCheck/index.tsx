@@ -12,6 +12,8 @@ const HealthCheck = (props: Props) => {
   return (
     <TextField
       label="Rating"
+      margin="dense"
+      required
       fullWidth
       value={rating}
       onChange={(event => setRating(event.target.value))}

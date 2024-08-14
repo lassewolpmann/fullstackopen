@@ -19,15 +19,21 @@ const Hospital = (props: Props) => {
   return (
     <>
       <TextField
+        type="date"
+        InputLabelProps={{ shrink: true }}
         label="Discharge Date"
+        margin="dense"
         fullWidth
+        required
         value={dischargeDate}
         onChange={(event => setDischargeDate(event.target.value))}
       />
 
       <TextField
         label="Discharge Condition"
+        margin="dense"
         fullWidth
+        required
         value={dischargeCondition}
         onChange={(event => setDischargeCondition(event.target.value))}
       />
