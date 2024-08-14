@@ -1,7 +1,10 @@
 import React, { BaseSyntheticEvent, useState } from "react";
-import patientService from "../../../../services/patients.ts";
 import { EntryWithoutId, Patient } from "../../../../types.ts";
-import { Button, TextField } from "@mui/material";
+import { Button, FormControl, Grid, InputLabel, MenuItem, Select, SelectChangeEvent, TextField } from "@mui/material";
+import HealthCheck from "./HealthCheck";
+import patientService from "../../../../services/patients.ts";
+import Hospital from "./Hospital";
+import Occupational from "./Occupational";
 
 interface Props {
   id: string,
@@ -15,33 +18,104 @@ const NewEntryForm = (props: Props) => {
   const { id, patient, setPatient, setNotification, setNotificationStatus } = props;
 
   const [formVisible, setFormVisible] = useState<boolean>(false);
+  const [entryType, setEntryType] = useState<string>('Hospital');
+
+  const toggleForm = () => setFormVisible(!formVisible);
+
+  const handleTypeChange = (event: SelectChangeEvent<string>) => {
+    setEntryType(event.target.value);
+  };
+
   const [description, setDescription] = useState<string>('');
   const [date, setDate] = useState<string>('');
   const [specialist, setSpecialist] = useState<string>('');
-  const [rating, setRating] = useState<string>('');
   const [codes, setCodes] = useState<string>('');
 
+  // Health Check
+  const [rating, setRating] = useState<string>('');
 
-  const style = {
-    border: '1px solid black',
-    borderRadius: '10px',
-    padding: '10px 20px',
-    margin: '10px 0'
+  // Hospital
+  const [dischargeDate, setDischargeDate] = useState<string>('');
+  const [dischargeCondition, setDischargeCondition] = useState<string>('');
+
+  // Occupational
+  const [employer, setEmployer] = useState<string>('');
+  const [sickLeaveStart, setSickLeaveStart] = useState<string>('');
+  const [sickLeaveEnd, setSickLeaveEnd] = useState<string>('');
+
+  const resetValues = () => {
+    setDescription('');
+    setDate('');
+    setSpecialist('');
+    setCodes('');
+    setRating('');
+    setDischargeDate('');
+    setDischargeCondition('');
+    setEmployer('');
+    setSickLeaveStart('');
+    setSickLeaveEnd('');
+  }
+
+  const handleReset = (event: BaseSyntheticEvent) => {
+    event.preventDefault();
+    resetValues();
+    toggleForm();
   };
-
-  const toggleForm = () => setFormVisible(!formVisible);
 
   const handleSubmit = (event: BaseSyntheticEvent) => {
     event.preventDefault();
 
-    const object: EntryWithoutId = {
-      date: date,
-      description: description,
-      specialist: specialist,
-      type: "HealthCheck",
-      healthCheckRating: Number(rating),
-      diagnosisCodes: codes.split(',')
-    };
+    let object: EntryWithoutId;
+
+    switch (entryType) {
+      case "Hospital":
+        object = {
+          date: date,
+          description: description,
+          specialist: specialist,
+          diagnosisCodes: codes.split(','),
+          type: 'Hospital',
+          discharge: {
+            date: dischargeDate,
+            criteria: dischargeCondition
+          }
+        };
+
+        break;
+      case "OccupationalHealthcare":
+        object = {
+          date: date,
+          description: description,
+          specialist: specialist,
+          diagnosisCodes: codes.split(','),
+          type: 'OccupationalHealthcare',
+          employerName: employer
+        };
+
+        if (sickLeaveStart !== '' && sickLeaveEnd !== '') {
+          object.sickLeave = {
+            startDate: sickLeaveStart,
+            endDate: sickLeaveEnd
+          };
+        }
+
+        break;
+      case "HealthCheck":
+        object = {
+          date: date,
+          description: description,
+          specialist: specialist,
+          diagnosisCodes: codes.split(','),
+          type: 'HealthCheck',
+          healthCheckRating: Number(rating)
+        };
+
+        break;
+      default:
+        console.log('Invalid Entry Type');
+
+        return;
+    }
 
     patientService.createEntry(object, id)
       .then(data => {
@@ -52,15 +126,10 @@ const NewEntryForm = (props: Props) => {
 
         setNotification('Added Entry');
         setNotificationStatus('success');
-
-        toggleForm();
-        setDescription('');
-        setDate('');
-        setSpecialist('');
-        setRating('');
-        setCodes('');
+        resetValues();
       })
       .catch(error => {
+        console.log(error);
         setNotification(error.response.data);
         setNotificationStatus('error');
       });
@@ -77,42 +146,62 @@ const NewEntryForm = (props: Props) => {
     );
   } else {
     return (
-      <form style={style} onReset={toggleForm} onSubmit={handleSubmit}>
-        <h2>New HealthCheck entry</h2>
-        <TextField
-          label="Description"
-          fullWidth
-          value={description}
-          onChange={(event => setDescription(event.target.value))}
-        />
-        <TextField
-          label="Date"
-          fullWidth
-          value={date}
-          onChange={(event => setDate(event.target.value))}
-        />
-        <TextField
-          label="Specialist"
-          fullWidth
-          value={specialist}
-          onChange={(event => setSpecialist(event.target.value))}
-        />
-        <TextField
-          label="Rating"
-          fullWidth
-          value={rating}
-          onChange={(event => setRating(event.target.value))}
-        />
-        <TextField
-          label="Diagnosis codes"
-          fullWidth
-          value={codes}
-          onChange={(event => setCodes(event.target.value))}
-        />
+      <div>
+        <form onSubmit={handleSubmit} onReset={handleReset}>
+          <FormControl fullWidth>
+            <InputLabel id="entry-type-label">Entry Type</InputLabel>
+            <Select
+              labelId="entry-type-label"
+              id="entry-type-select"
+              value={entryType}
+              label="Entry Type"
+              onChange={handleTypeChange}
+            >
+              <MenuItem value={"Hospital"}>Hospital</MenuItem>
+              <MenuItem value={"OccupationalHealthcare"}>Occupational Healthcare</MenuItem>
+              <MenuItem value={"HealthCheck"}>Health Check</MenuItem>
+            </Select>
 
-        <Button type="reset" variant="contained" color="error">cancel</Button>
-        <Button type="submit" variant="contained" color="success">add entry</Button>
-      </form>
+            <TextField
+              label="Description"
+              fullWidth
+              value={description}
+              onChange={(event => setDescription(event.target.value))}
+            />
+            <TextField
+              label="Date"
+              fullWidth
+              value={date}
+              onChange={(event => setDate(event.target.value))}
+            />
+            <TextField
+              label="Specialist"
+              fullWidth
+              value={specialist}
+              onChange={(event => setSpecialist(event.target.value))}
+            />
+            <TextField
+              label="Diagnosis codes"
+              fullWidth
+              value={codes}
+              onChange={(event => setCodes(event.target.value))}
+            />
+
+            {entryType === 'Hospital' && <Hospital dischargeDate={dischargeDate} setDischargeDate={setDischargeDate} dischargeCondition={dischargeCondition} setDischargeCondition={setDischargeCondition} />}
+            {entryType === 'OccupationalHealthcare' && <Occupational employer={employer} setEmployer={setEmployer} sickLeaveStart={sickLeaveStart} setSickLeaveStart={setSickLeaveStart} sickLeaveEnd={sickLeaveEnd} setSickLeaveEnd={setSickLeaveEnd} />}
+            {entryType === 'HealthCheck' && <HealthCheck rating={rating} setRating={setRating} />}
+
+            <Grid container spacing={2}>
+              <Grid item>
+                <Button type="submit" variant="contained" color="success">add entry</Button>
+              </Grid>
+              <Grid item>
+                <Button type="reset" variant="contained" color="error">cancel</Button>
+              </Grid>
+            </Grid>
+          </FormControl>
+        </form>
+      </div>
     );
   }
 };

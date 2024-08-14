@@ -190,8 +190,13 @@ const toNewEntry = (object: unknown): EntryWithoutId => {
         } else {
           throw new Error('Start- and/or End date missing');
         }
+      } else if ('employerName' in object) {
+        return {
+          ...entry,
+          employerName: parseEmployer(object.employerName)
+        };
       } else {
-        throw new Error('Employer Name and/or Sick Leave missing');
+        throw new Error('Employer Name missing');
       }
     } else if (object.type === "HealthCheck") {
       if ('healthCheckRating' in object) {
